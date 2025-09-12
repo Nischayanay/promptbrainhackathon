@@ -1,0 +1,1 @@
+// DELETED - This component was removed after sidebar redesign revert

@@ -1,0 +1,18 @@
+OG Image Placeholder for PromptBrain
+
+This file should be replaced with an actual og-image.png file (1200x630 pixels) featuring:
+
+- PromptBrain branding
+- "We Architect Context" headline
+- AI/neural network visual elements
+- Dark background with electric blue accents
+- Professional design matching the landing page
+
+Recommended image source: https://images.unsplash.com/photo-1549925245-f20a1bac6454
+
+The image should be optimized for social media sharing on:
+- Facebook/LinkedIn (1200x630)
+- Twitter/X (1200x675)
+- General social media platforms
+
+Save as: og-image.png in the /public directory

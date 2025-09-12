@@ -1,0 +1,40 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /signup
+
+# Disallow protected routes
+Disallow: /temple
+Disallow: /role-selection
+Disallow: /gift-of-entry
+
+# Disallow admin or private areas
+Disallow: /admin
+Disallow: /api
+Disallow: /private
+
+# Sitemap location
+Sitemap: https://promptbrain.vercel.app/sitemap.xml
+
+# Crawl delay (optional - helps with server load)
+Crawl-delay: 1
+
+# Allow specific search engine bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Social media crawlers for rich previews
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

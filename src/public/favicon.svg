@@ -1,0 +1,31 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- PromptBrain Icon - Brain/Neural Network with Electric Blue -->
+  <circle cx="16" cy="16" r="15" fill="#000000" stroke="#3B82F6" stroke-width="2"/>
+  
+  <!-- Neural network pattern -->
+  <g fill="#3B82F6" opacity="0.8">
+    <!-- Central node -->
+    <circle cx="16" cy="16" r="2"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="10" cy="10" r="1.5"/>
+    <circle cx="22" cy="10" r="1.5"/>
+    <circle cx="8" cy="16" r="1.5"/>
+    <circle cx="24" cy="16" r="1.5"/>
+    <circle cx="10" cy="22" r="1.5"/>
+    <circle cx="22" cy="22" r="1.5"/>
+  </g>
+  
+  <!-- Connection lines -->
+  <g stroke="#3B82F6" stroke-width="1" opacity="0.4">
+    <line x1="16" y1="16" x2="10" y2="10"/>
+    <line x1="16" y1="16" x2="22" y2="10"/>
+    <line x1="16" y1="16" x2="8" y2="16"/>
+    <line x1="16" y1="16" x2="24" y2="16"/>
+    <line x1="16" y1="16" x2="10" y2="22"/>
+    <line x1="16" y1="16" x2="22" y2="22"/>
+  </g>
+  
+  <!-- Glow effect -->
+  <circle cx="16" cy="16" r="2" fill="none" stroke="#00FFF7" stroke-width="0.5" opacity="0.6"/>
+</svg>
