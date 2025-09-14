@@ -52,9 +52,9 @@ export function useAppNavigation() {
       console.error('PromptBrain: Error completing onboarding:', error);
     }
     
-    console.log('PromptBrain: Setting current page to temple with enhance focus');
+    console.log('PromptBrain: Setting current page to enhance (Dashboard 2.0)');
     setPreviousPage(currentPage);
-    setCurrentPage('temple');
+    setCurrentPage('enhance');
   };
 
   const navigateToTemple = async () => {

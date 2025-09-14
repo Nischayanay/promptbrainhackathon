@@ -1,7 +1,8 @@
 import { PRDLandingPage } from "./components/PRDLandingPage";
 import { LoginCard } from "./components/LoginCard";
 import { SignupCard } from "./components/SignupCard";
-import { Dashboard } from "./components/Dashboard";
+import { Dashboard2Pro } from "./components/Dashboard2Pro";
+import { PromptEnhancer } from "./components/PromptEnhancer";
 import { Profile } from "./components/Profile";
 import { DesktopSplitLayout } from "./components/layouts/DesktopSplitLayout";
 import { MobileLayout } from "./components/layouts/MobileLayout";
@@ -123,6 +124,18 @@ export default function App() {
             onNavigateToSignup={navigateToSignup}
             onNavigateToLogin={navigateToLogin}
           />
+          {/* Dashboard2 Pro Test Button */}
+          <div className="fixed bottom-4 right-4 z-50">
+            <button
+              onClick={() => {
+                console.log("Clicking Dashboard 2.0 Pro button - navigating to enhance")
+                navigateToPage('enhance')
+              }}
+              className="px-6 py-3 bg-gradient-to-r from-[#6E00FF] to-[#3B82F6] text-white rounded-lg shadow-lg hover:scale-105 transition-transform font-semibold"
+            >
+              🚀 NEW Dashboard 2.0 Pro
+            </button>
+          </div>
         </main>
       );
     } catch (error) {
@@ -139,6 +152,12 @@ export default function App() {
               Go to Login
             </button>
             <button
+              onClick={() => navigateToPage('enhance')}
+              className="px-4 py-2 bg-gradient-to-r from-[#6E00FF] to-[#3B82F6] text-white rounded mr-2"
+            >
+              Dashboard 2.0
+            </button>
+            <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-gray-600 text-white rounded"
             >
@@ -150,45 +169,27 @@ export default function App() {
     }
   }
 
-  // Show Dashboard - The Mind Temple workspace
+  // Show Dashboard - REDIRECT TO NEW DASHBOARD 2.0
   if (currentPage === "temple") {
-    try {
-      return (
-        <AppLayout
-          currentPage={currentPage}
-          onNavigate={navigateToPage}
-          className="min-h-screen bg-cinematic-base"
-        >
-          <main id="main-content" role="main">
-            <Dashboard
-              onNavigateToProfile={navigateToProfile}
-              onNavigateBack={
-                previousPage === "profile"
-                  ? navigateBack
-                  : undefined
-              }
-              showBackToProfile={previousPage === "profile"}
-            />
-          </main>
-        </AppLayout>
-      );
-    } catch (error) {
-      console.error("Dashboard render error:", error);
-      return (
-        <div className="min-h-screen bg-temple-black flex items-center justify-center">
-          <div className="text-marble-white text-center">
-            <h1 className="text-2xl mb-4">Mind Temple</h1>
-            <p className="mb-4">Dashboard failed to load.</p>
-            <button
-              onClick={() => navigateToLanding()}
-              className="px-4 py-2 bg-royal-gold text-temple-black rounded"
-            >
-              Back to Landing
-            </button>
-          </div>
+    // Automatically redirect temple to enhance (new dashboard)
+    console.log("Redirecting from temple to enhance (Dashboard 2.0)")
+    navigateToPage('enhance')
+    return null
+  }
+
+  // Show Dashboard 2.0 (Professional Grok-Inspired Design)
+  if (currentPage === "enhance") {
+    console.log("Loading Dashboard 2.0 Pro on enhance page")
+    
+    // FORCE LOAD Dashboard2Pro - NO FALLBACKS TO OLD DASHBOARD
+    return (
+      <main id="main-content" role="main">
+        <div className="fixed top-4 left-4 bg-green-900/80 text-white p-2 rounded text-xs z-50">
+          ✅ Dashboard 2.0 Pro Loading
         </div>
-      );
-    }
+        <Dashboard2Pro />
+      </main>
+    );
   }
 
   // Show Profile Page
