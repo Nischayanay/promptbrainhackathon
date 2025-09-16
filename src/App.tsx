@@ -2,6 +2,8 @@ import { PRDLandingPage } from "./components/PRDLandingPage";
 import { LoginCard } from "./components/LoginCard";
 import { SignupCard } from "./components/SignupCard";
 import { Dashboard2Pro } from "./components/Dashboard2Pro";
+import { Dashboard2ProRedesigned } from "./components/Dashboard2ProRedesigned";
+import { Dashboard2ProSimple } from "./components/Dashboard2ProSimple";
 import { PromptEnhancer } from "./components/PromptEnhancer";
 import { Profile } from "./components/Profile";
 import { DesktopSplitLayout } from "./components/layouts/DesktopSplitLayout";
@@ -177,17 +179,17 @@ export default function App() {
     return null
   }
 
-  // Show Dashboard 2.0 (Professional Grok-Inspired Design)
+  // Show Dashboard 2.0 (Premium Redesigned)
   if (currentPage === "enhance") {
-    console.log("Loading Dashboard 2.0 Pro on enhance page")
+    console.log("Loading Dashboard 2.0 Pro Redesigned on enhance page")
     
-    // FORCE LOAD Dashboard2Pro - NO FALLBACKS TO OLD DASHBOARD
+    // LOAD NEW REDESIGNED DASHBOARD
     return (
       <main id="main-content" role="main">
         <div className="fixed top-4 left-4 bg-green-900/80 text-white p-2 rounded text-xs z-50">
-          ✅ Dashboard 2.0 Pro Loading
+          ✅ Dashboard 2.0 Pro Redesigned Loading
         </div>
-        <Dashboard2Pro />
+        <Dashboard2ProRedesigned />
       </main>
     );
   }

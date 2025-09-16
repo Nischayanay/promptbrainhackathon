@@ -115,7 +115,7 @@ export function Dashboard2Pro() {
       icon: History,
       label: 'History',
       tooltip: 'Recent Activity',
-      expandedContent: { recentPrompts: chatHistory.slice(0, 3) }
+      expandedContent: { recentPrompts: chatHistory.slice(0, 3) || [] }
     },
     {
       id: 'settings',
@@ -862,7 +862,7 @@ export function Dashboard2Pro() {
                             <div className="font-medium text-sm">{item.label}</div>
 
                             {/* Expanded Content */}
-                            {item.id === 'profile' && item.expandedContent && (
+                            {item.id === 'profile' && item.expandedContent && 'username' in item.expandedContent && 'email' in item.expandedContent && (
                               <div className="text-xs text-white/50 mt-1">
                                 {item.expandedContent.username}
                                 <br />
@@ -870,16 +870,16 @@ export function Dashboard2Pro() {
                               </div>
                             )}
 
-                            {item.id === 'history' && item.expandedContent && (
+                            {item.id === 'history' && item.expandedContent && 'recentPrompts' in item.expandedContent && (
                               <div className="text-xs text-white/50 mt-1">
-                                {item.expandedContent.recentPrompts.length > 0
+                                {item.expandedContent.recentPrompts && item.expandedContent.recentPrompts.length > 0
                                   ? `${item.expandedContent.recentPrompts.length} recent items`
                                   : 'No recent activity'
                                 }
                               </div>
                             )}
 
-                            {item.id === 'settings' && item.expandedContent && (
+                            {item.id === 'settings' && item.expandedContent && 'theme' in item.expandedContent && (
                               <div className="text-xs text-white/50 mt-1">
                                 Theme: {item.expandedContent.theme}
                               </div>

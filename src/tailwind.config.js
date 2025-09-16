@@ -10,7 +10,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Temple theme colors
+        // Premium dashboard colors
+        'premium-bg': 'var(--bg)',
+        'premium-panel': 'var(--panel)',
+        'brand-gold': 'var(--brand-gold)',
+        'accent-cyan': 'var(--accent-cyan)',
+        'accent-purple': 'var(--accent-purple)',
+        'text-primary': 'var(--text-primary)',
+        'text-muted': 'var(--text-muted)',
+        'glass': 'var(--glass)',
+        'glass-border': 'var(--glass-border)',
+        
+        // Legacy temple theme colors (for compatibility)
         'temple-black': 'var(--color-temple-black)',
         'royal-gold': 'var(--color-royal-gold)',
         'marble-white': 'var(--color-marble-white)',
@@ -78,10 +89,26 @@ module.exports = {
         xl: "var(--radius-xl)",
       },
       fontFamily: {
+        'display': ['Playfair Display', 'serif'],
+        'body': ['Inter Variable', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
         serif: ['Playfair Display', 'Georgia', 'serif'],
       },
+      spacing: {
+        'sidebar-collapsed': 'var(--sidebar-width-collapsed)',
+        'sidebar-expanded': 'var(--sidebar-width-expanded)',
+        'console-height': 'var(--console-height)',
+        'credits-orb': 'var(--credits-orb-size)',
+      },
       animation: {
+        // Premium dashboard animations
+        'fade-in-up': 'fadeInUp 500ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards',
+        'fade-slide-up': 'fadeSlideUp 300ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards',
+        'breathing-glow': 'breathingGlow 6s ease-in-out infinite',
+        'charge-pulse': 'chargePulse 400ms ease-out',
+        'clip-reveal': 'clipPathReveal 600ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards',
+        
+        // Legacy animations (for compatibility)
         'gradient-flow': 'gradient-flow 12s ease infinite',
         'temple-glow': 'temple-glow 4s ease-in-out infinite',
         'beam-rise': 'beam-rise 3s ease-out infinite',
@@ -100,6 +127,10 @@ module.exports = {
         'twinkle-subtle': 'twinkle-subtle 4s ease-in-out infinite',
         'slow-glow': 'slow-glow 6s ease-in-out infinite',
         'slide-in-from-right': 'slide-in-from-right 0.5s ease-out',
+      },
+      transitionTimingFunction: {
+        'premium-out': 'cubic-bezier(0.2, 0.9, 0.2, 1)',
+        'premium-in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },
