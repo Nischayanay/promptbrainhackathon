@@ -4,7 +4,7 @@ import {
   ChevronRight, 
   ChevronLeft, 
   Check, 
-  Skip, 
+  SkipForward, 
   HelpCircle,
   X
 } from 'lucide-react'
@@ -308,7 +308,7 @@ export function FlowQuestionCard({
                   transition-all duration-150 premium-focus
                 "
               >
-                <Skip className="w-4 h-4" />
+                <SkipForward className="w-4 h-4" />
                 <span>Skip</span>
               </motion.button>
             )}
