@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppShell, AppShellHero } from './Layout/AppShell'
 import { CollapsibleSidebar } from './Layout/CollapsibleSidebar'
-import { FloatingCreditsOrb, useCredits } from './Layout/FloatingCreditsOrb'
+import { FloatingCreditsOrb } from './Layout/FloatingCreditsOrb'
+import { useCredits } from '../lib/credits'
 import { PromptConsole } from './Prompt/PromptConsole'
 import { FlowQuestionCard, FlowContextChips } from './Prompt/FlowQuestionCard'
 import { useFlowMode } from '../hooks/useFlowMode'
@@ -30,16 +31,8 @@ export function Dashboard2ProRedesigned() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [activeNavItem, setActiveNavItem] = useState('enhance')
   
-  // Credits system
-  const {
-    credits,
-    maxCredits,
-    usedToday,
-    isAnimating: creditsAnimating,
-    useCredit,
-    addCredits,
-    canUseCredit
-  } = useCredits(42, 100)
+  // Credits system (unified hook)
+  const { credits, canSpend, spend, earn } = useCredits(50)
   
   // Flow mode
   const {
@@ -104,10 +97,14 @@ export function Dashboard2ProRedesigned() {
 
   // Enhancement logic
   const enhancePrompt = async (effectType = 'enhance') => {
-    if (!input.trim() || isEnhancing || !canUseCredit) return
+    if (!input.trim() || isEnhancing || !canSpend) return
 
     setIsEnhancing(true)
-    useCredit() // Trigger credits animation
+    const spent = spend(1, 'enhance')
+    if (!spent) {
+      setIsEnhancing(false)
+      return
+    }
 
     try {
       // Simulate API call
@@ -145,8 +142,7 @@ export function Dashboard2ProRedesigned() {
 
   // Handle insufficient credits
   const handleAddCredits = () => {
-    // Mock upgrade flow
-    console.log('Opening upgrade modal...')
+    earn(10, 'bonus')
   }
 
   // Navigation handlers
@@ -187,11 +183,11 @@ export function Dashboard2ProRedesigned() {
         creditsOrb={
           <FloatingCreditsOrb
             credits={credits}
-            maxCredits={maxCredits}
-            usedToday={usedToday}
+            maxCredits={100}
+            usedToday={0}
             onAddCredits={handleAddCredits}
-            onUseCredit={useCredit}
-            isAnimating={creditsAnimating}
+            onUseCredit={() => spend(1)}
+            isAnimating={false}
           />
         }
       >

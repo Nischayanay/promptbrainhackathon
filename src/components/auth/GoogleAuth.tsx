@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { Chrome, Loader2, Zap } from 'lucide-react';
 import { Button } from '../ui/button';
 import { toast } from 'sonner@2.0.3';
+import { signInWithGoogle } from '../../utils/auth';
+import { useNavigate } from 'react-router-dom';
 
 interface GoogleAuthProps {
   onSuccess?: (user: any) => void;
@@ -12,36 +14,24 @@ interface GoogleAuthProps {
 
 export function GoogleAuth({ onSuccess, onError, mode = 'signup' }: GoogleAuthProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleGoogleAuth = async () => {
     setIsLoading(true);
-    
     try {
-      // Simulate Google OAuth flow
-      // In production, this would integrate with Supabase Auth
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful authentication
-      const mockUser = {
-        id: 'google_' + Date.now(),
-        email: 'demo@promptbrain.ai',
-        name: 'Demo User',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
-        provider: 'google',
-        credits: 50 // Starting credits
-      };
-      
-      // Store user in localStorage for demo
-      localStorage.setItem('promptbrain_user', JSON.stringify(mockUser));
-      localStorage.setItem('promptbrain_auth_token', 'demo_token_' + Date.now());
-      
-      onSuccess?.(mockUser);
-      toast.success(`Welcome to PromptBrain! You have 50 free credits to get started.`);
-      
-    } catch (error) {
-      const errorMessage = 'Authentication failed. Please try again.';
-      onError?.(errorMessage);
-      toast.error(errorMessage);
+      const result = await signInWithGoogle();
+      if (!result.success && result.error) {
+        onError?.(result.error);
+        toast.error(result.error);
+        return;
+      }
+      // Supabase OAuth will redirect; if it does not (e.g. popup), navigate on success
+      onSuccess?.(null);
+      toast.success('Redirecting to Google...');
+      // Optional: navigate('/enhance') after auth listener catches SIGNED_IN
+    } catch (e) {
+      onError?.('Authentication failed. Please try again.');
+      toast.error('Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
