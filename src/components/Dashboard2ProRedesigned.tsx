@@ -26,6 +26,7 @@ export function Dashboard2ProRedesigned() {
   const [input, setInput] = useState('')
   const [isEnhancing, setIsEnhancing] = useState(false)
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
+  const HISTORY_KEY = 'pbm_chat_history_v1'
   
   // Layout state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
@@ -33,6 +34,23 @@ export function Dashboard2ProRedesigned() {
   
   // Credits system (unified hook)
   const { credits, canSpend, spend, earn } = useCredits(50)
+
+  // Restore and persist chat history
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) setChatHistory(parsed)
+      }
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(chatHistory))
+    } catch {}
+  }, [chatHistory])
   
   // Flow mode
   const {
@@ -108,7 +126,7 @@ export function Dashboard2ProRedesigned() {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1800))
+      await new Promise(resolve => setTimeout(resolve, 1200))
 
       const newMessage: ChatMessage = {
         id: Date.now().toString(),
@@ -170,6 +188,12 @@ export function Dashboard2ProRedesigned() {
 
   return (
     <div className="min-h-screen bg-premium-bg text-text-primary font-body">
+      {/* Low Credits Banner */}
+      {credits < 5 && (
+        <div className="sticky top-0 z-40 bg-red-900/30 border-b border-red-800/40 text-red-200 text-sm px-4 py-2">
+          Low credits. Earn more or upgrade to continue enhancing.
+        </div>
+      )}
       <AppShell
         sidebar={
           <CollapsibleSidebar
@@ -240,6 +264,23 @@ export function Dashboard2ProRedesigned() {
           )}
         </AnimatePresence>
 
+        {/* Enhancing Skeleton */}
+        <AnimatePresence>
+          {isEnhancing && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="max-w-4xl mx-auto mt-8 p-6 rounded-2xl bg-glass border border-white/10 animate-pulse"
+            >
+              <div className="h-4 w-24 bg-white/10 rounded mb-4" />
+              <div className="h-3 w-3/4 bg-white/10 rounded mb-2" />
+              <div className="h-3 w-2/3 bg-white/10 rounded mb-2" />
+              <div className="h-3 w-1/2 bg-white/10 rounded" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Chat History */}
         <AnimatePresence>
           {chatHistory.length > 0 && (
@@ -288,11 +329,17 @@ export function Dashboard2ProRedesigned() {
                     </div>
                   </div>
 
-                  {/* Output */}
+                  {/* Output with tabs */}
                   <div>
                     <div className="text-sm text-text-muted mb-2">Enhanced Output:</div>
-                    <div className="text-text-primary bg-glass rounded-lg p-4 text-sm leading-relaxed whitespace-pre-wrap">
-                      {message.output}
+                    <div className="bg-glass rounded-lg p-0 border border-white/10">
+                      <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10 text-xs">
+                        <button className="px-2 py-1 rounded bg-white/10 text-white">Text</button>
+                        <button className="px-2 py-1 rounded text-text-muted hover:text-white">JSON</button>
+                      </div>
+                      <div className="p-4 text-text-primary text-sm leading-relaxed whitespace-pre-wrap">
+                        {message.output}
+                      </div>
                     </div>
                   </div>
 
@@ -306,6 +353,7 @@ export function Dashboard2ProRedesigned() {
                         rounded-lg hover:bg-glass transition-all duration-150
                         premium-focus
                       "
+                      onClick={() => navigator.clipboard.writeText(message.output)}
                     >
                       Copy
                     </motion.button>
@@ -317,8 +365,9 @@ export function Dashboard2ProRedesigned() {
                         rounded-lg hover:bg-glass transition-all duration-150
                         premium-focus
                       "
+                      onClick={() => setInput(message.input)}
                     >
-                      Re-run
+                      Use as new input
                     </motion.button>
                   </div>
                 </motion.div>
