@@ -7,6 +7,7 @@ import { useCredits } from '../lib/credits'
 import { PromptConsole } from './Prompt/PromptConsole'
 import { FlowQuestionCard, FlowContextChips } from './Prompt/FlowQuestionCard'
 import { useFlowMode } from '../hooks/useFlowMode'
+import { designTokens } from '../lib/designTokens'
 
 type Mode = 'ideate' | 'flow'
 
@@ -26,6 +27,7 @@ export function Dashboard2ProRedesigned() {
   const [input, setInput] = useState('')
   const [isEnhancing, setIsEnhancing] = useState(false)
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
+  const [announcement, setAnnouncement] = useState('')
   const HISTORY_KEY = 'pbm_chat_history_v1'
   
   // Layout state
@@ -113,14 +115,16 @@ export function Dashboard2ProRedesigned() {
     updateAnswer(flowState.currentStep, answer)
   }
 
-  // Enhancement logic
+  // Enhancement logic with accessibility announcements
   const enhancePrompt = async (effectType = 'enhance') => {
     if (!input.trim() || isEnhancing || !canSpend) return
 
     setIsEnhancing(true)
+    setAnnouncement('Enhancement started...')
     const spent = spend(1, 'enhance')
     if (!spent) {
       setIsEnhancing(false)
+      setAnnouncement('Insufficient credits to enhance prompt')
       return
     }
 
@@ -139,9 +143,11 @@ export function Dashboard2ProRedesigned() {
 
       setChatHistory(prev => [newMessage, ...prev])
       setInput('')
+      setAnnouncement(`Prompt enhanced successfully! ${credits - 1} credits remaining.`)
 
     } catch (error) {
       console.error('Enhancement failed:', error)
+      setAnnouncement('Enhancement failed. Please try again.')
     } finally {
       setIsEnhancing(false)
     }
@@ -187,11 +193,35 @@ export function Dashboard2ProRedesigned() {
   }
 
   return (
-    <div className="min-h-screen bg-premium-bg text-text-primary font-body">
-      {/* Low Credits Banner */}
+    <div 
+      className="min-h-screen text-text-primary font-body"
+      style={{ 
+        backgroundColor: designTokens.colors.background,
+        fontFamily: designTokens.typography.fontBody
+      }}
+    >
+      {/* Screen reader announcements */}
+      <div 
+        aria-live="polite" 
+        aria-atomic="true" 
+        className="sr-only"
+      >
+        {announcement}
+      </div>
+
+      {/* Low Credits Banner with improved accessibility */}
       {credits < 5 && (
-        <div className="sticky top-0 z-40 bg-red-900/30 border-b border-red-800/40 text-red-200 text-sm px-4 py-2">
-          Low credits. Earn more or upgrade to continue enhancing.
+        <div 
+          role="alert"
+          aria-live="assertive"
+          className="sticky top-0 z-40 border-b text-sm px-4 py-2"
+          style={{
+            backgroundColor: `${designTokens.colors.error}20`,
+            borderColor: `${designTokens.colors.error}40`,
+            color: designTokens.colors.textPrimary
+          }}
+        >
+          <span className="font-medium">Low credits warning:</span> You have {credits} credits remaining. Earn more or upgrade to continue enhancing.
         </div>
       )}
       <AppShell
@@ -264,24 +294,43 @@ export function Dashboard2ProRedesigned() {
           )}
         </AnimatePresence>
 
-        {/* Enhancing Skeleton */}
+        {/* Enhancing Skeleton with improved accessibility */}
         <AnimatePresence>
           {isEnhancing && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="max-w-4xl mx-auto mt-8 p-6 rounded-2xl bg-glass border border-white/10 animate-pulse"
+              className="max-w-4xl mx-auto mt-8 p-6 rounded-2xl border animate-pulse"
+              style={{
+                backgroundColor: designTokens.colors.glass,
+                borderColor: designTokens.colors.glassBorder,
+                borderRadius: designTokens.borderRadius.lg
+              }}
+              role="status"
+              aria-label="Enhancing your prompt"
             >
-              <div className="h-4 w-24 bg-white/10 rounded mb-4" />
-              <div className="h-3 w-3/4 bg-white/10 rounded mb-2" />
-              <div className="h-3 w-2/3 bg-white/10 rounded mb-2" />
-              <div className="h-3 w-1/2 bg-white/10 rounded" />
+              <div 
+                className="h-4 w-24 rounded mb-4"
+                style={{ backgroundColor: designTokens.colors.glass }}
+              />
+              <div 
+                className="h-3 w-3/4 rounded mb-2"
+                style={{ backgroundColor: designTokens.colors.glass }}
+              />
+              <div 
+                className="h-3 w-2/3 rounded mb-2"
+                style={{ backgroundColor: designTokens.colors.glass }}
+              />
+              <div 
+                className="h-3 w-1/2 rounded"
+                style={{ backgroundColor: designTokens.colors.glass }}
+              />
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Chat History */}
+        {/* Chat History with improved accessibility */}
         <AnimatePresence>
           {chatHistory.length > 0 && (
             <motion.div
@@ -290,87 +339,176 @@ export function Dashboard2ProRedesigned() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-12 space-y-6"
+              role="region"
+              aria-label="Recent enhancements"
             >
-              <h3 className="text-xl font-semibold text-text-primary text-center mb-8">
+              <h3 
+                className="text-xl font-semibold text-center mb-8"
+                style={{ 
+                  color: designTokens.colors.textPrimary,
+                  fontSize: designTokens.typography.h3,
+                  fontWeight: designTokens.typography.semibold
+                }}
+              >
                 Recent Enhancements
               </h3>
               
               {chatHistory.slice(0, 3).map((message, index) => (
-                <motion.div
+                <motion.article
                   key={message.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="glass-panel rounded-2xl p-6 max-w-4xl mx-auto"
+                  className="rounded-2xl p-6 max-w-4xl mx-auto"
+                  style={{
+                    backgroundColor: designTokens.colors.glass,
+                    borderColor: designTokens.colors.glassBorder,
+                    borderRadius: designTokens.borderRadius.lg,
+                    border: `1px solid ${designTokens.colors.glassBorder}`
+                  }}
+                  role="article"
+                  aria-labelledby={`message-${message.id}-title`}
                 >
                   {/* Message Header */}
-                  <div className="flex items-center justify-between mb-4">
+                  <header className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <div className={`
-                        px-3 py-1 rounded-full text-xs font-semibold
-                        ${message.mode === 'ideate' 
-                          ? 'bg-gradient-to-r from-purple-400 to-pink-500 text-white'
-                          : 'bg-gradient-to-r from-blue-400 to-cyan-500 text-white'
-                        }
-                      `}>
+                      <div 
+                        className="px-3 py-1 rounded-full text-xs font-semibold"
+                        style={{
+                          background: message.mode === 'ideate' 
+                            ? `linear-gradient(135deg, ${designTokens.colors.accentPurple}, ${designTokens.colors.brandGold})`
+                            : `linear-gradient(135deg, ${designTokens.colors.accentCyan}, ${designTokens.colors.brandGold})`,
+                          color: designTokens.colors.background
+                        }}
+                      >
                         {message.mode === 'ideate' ? '🪄 Ideate' : '🌊 Flow'}
                       </div>
-                      <span className="text-text-muted text-sm">
+                      <time 
+                        className="text-sm"
+                        style={{ color: designTokens.colors.textMuted }}
+                        dateTime={message.timestamp}
+                      >
                         {new Date(message.timestamp).toLocaleTimeString()}
-                      </span>
+                      </time>
                     </div>
-                  </div>
+                  </header>
 
                   {/* Input */}
-                  <div className="mb-4">
-                    <div className="text-sm text-text-muted mb-2">Input:</div>
-                    <div className="text-text-primary bg-glass rounded-lg p-3 text-sm">
+                  <section className="mb-4">
+                    <h4 
+                      className="text-sm mb-2"
+                      style={{ color: designTokens.colors.textMuted }}
+                    >
+                      Input:
+                    </h4>
+                    <div 
+                      className="rounded-lg p-3 text-sm"
+                      style={{
+                        backgroundColor: designTokens.colors.panel,
+                        color: designTokens.colors.textPrimary,
+                        borderRadius: designTokens.borderRadius.md
+                      }}
+                    >
                       {message.input}
                     </div>
-                  </div>
+                  </section>
 
                   {/* Output with tabs */}
-                  <div>
-                    <div className="text-sm text-text-muted mb-2">Enhanced Output:</div>
-                    <div className="bg-glass rounded-lg p-0 border border-white/10">
-                      <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10 text-xs">
-                        <button className="px-2 py-1 rounded bg-white/10 text-white">Text</button>
-                        <button className="px-2 py-1 rounded text-text-muted hover:text-white">JSON</button>
+                  <section>
+                    <h4 
+                      className="text-sm mb-2"
+                      style={{ color: designTokens.colors.textMuted }}
+                    >
+                      Enhanced Output:
+                    </h4>
+                    <div 
+                      className="rounded-lg p-0 border"
+                      style={{
+                        backgroundColor: designTokens.colors.panel,
+                        borderColor: designTokens.colors.glassBorder,
+                        borderRadius: designTokens.borderRadius.md
+                      }}
+                    >
+                      <div 
+                        className="flex items-center gap-2 px-3 py-2 border-b text-xs"
+                        style={{ borderColor: designTokens.colors.glassBorder }}
+                        role="tablist"
+                        aria-label="Output format tabs"
+                      >
+                        <button 
+                          className="px-2 py-1 rounded text-white"
+                          style={{ backgroundColor: designTokens.colors.glass }}
+                          role="tab"
+                          aria-selected="true"
+                          aria-controls={`output-${message.id}-text`}
+                        >
+                          Text
+                        </button>
+                        <button 
+                          className="px-2 py-1 rounded hover:text-white transition-colors"
+                          style={{ color: designTokens.colors.textMuted }}
+                          role="tab"
+                          aria-selected="false"
+                          aria-controls={`output-${message.id}-json`}
+                        >
+                          JSON
+                        </button>
                       </div>
-                      <div className="p-4 text-text-primary text-sm leading-relaxed whitespace-pre-wrap">
+                      <div 
+                        id={`output-${message.id}-text`}
+                        className="p-4 text-sm leading-relaxed whitespace-pre-wrap"
+                        style={{ 
+                          color: designTokens.colors.textPrimary,
+                          fontSize: designTokens.typography.body
+                        }}
+                        role="tabpanel"
+                        aria-labelledby={`output-${message.id}-text-tab`}
+                      >
                         {message.output}
                       </div>
                     </div>
-                  </div>
+                  </section>
 
                   {/* Actions */}
-                  <div className="flex items-center justify-end mt-4 space-x-2">
+                  <footer className="flex items-center justify-end mt-4 space-x-2">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="
-                        px-4 py-2 text-sm text-text-muted hover:text-text-primary
-                        rounded-lg hover:bg-glass transition-all duration-150
-                        premium-focus
-                      "
-                      onClick={() => navigator.clipboard.writeText(message.output)}
+                      className="px-4 py-2 text-sm rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        color: designTokens.colors.textMuted,
+                        backgroundColor: 'transparent',
+                        borderRadius: designTokens.borderRadius.md,
+                        focusRingColor: designTokens.colors.focusRing
+                      }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(message.output)
+                        setAnnouncement('Output copied to clipboard')
+                      }}
+                      aria-label={`Copy output for ${message.mode} enhancement`}
                     >
                       Copy
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="
-                        px-4 py-2 text-sm text-text-muted hover:text-text-primary
-                        rounded-lg hover:bg-glass transition-all duration-150
-                        premium-focus
-                      "
-                      onClick={() => setInput(message.input)}
+                      className="px-4 py-2 text-sm rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                      style={{
+                        color: designTokens.colors.textMuted,
+                        backgroundColor: 'transparent',
+                        borderRadius: designTokens.borderRadius.md,
+                        focusRingColor: designTokens.colors.focusRing
+                      }}
+                      onClick={() => {
+                        setInput(message.input)
+                        setAnnouncement('Input loaded for editing')
+                      }}
+                      aria-label={`Use "${message.input.substring(0, 30)}..." as new input`}
                     >
                       Use as new input
                     </motion.button>
-                  </div>
-                </motion.div>
+                  </footer>
+                </motion.article>
               ))}
             </motion.div>
           )}

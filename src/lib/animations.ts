@@ -1,7 +1,21 @@
 // Cinematic AI Experience Animation System
-// Framer Motion configurations for 60fps performance
+// Framer Motion configurations for 60fps performance with accessibility support
 
 import { CINEMATIC_TIMING, CINEMATIC_EASING, CINEMATIC_STAGGER } from './performance';
+
+// Check for reduced motion preference
+const prefersReducedMotion = typeof window !== 'undefined' 
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+  : false;
+
+// Accessibility-aware motion configuration
+export const ACCESSIBLE_MOTION = {
+  duration: prefersReducedMotion ? 0.01 : 0.3,
+  ease: prefersReducedMotion ? "linear" : [0.4, 0, 0.2, 1],
+  stagger: prefersReducedMotion ? 0 : 0.1,
+  scale: prefersReducedMotion ? 1 : 1.05,
+  translate: prefersReducedMotion ? 0 : 4
+};
 
 // Transition presets
 export const CINEMATIC_TRANSITIONS = {
@@ -83,23 +97,26 @@ export const CINEMATIC_VARIANTS = {
     exit: { opacity: 0, scale: 1.05, y: -20 },
   },
   
-  // Card states
+  // Card states with accessibility support
   cardStates: {
-    initial: { opacity: 0, y: 40, scale: 0.95 },
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 40, scale: prefersReducedMotion ? 1 : 0.95 },
     animate: { opacity: 1, y: 0, scale: 1 },
-    hover: { y: -4, scale: 1.02 },
-    tap: { scale: 0.98 },
+    hover: { y: prefersReducedMotion ? 0 : -4, scale: prefersReducedMotion ? 1 : 1.02 },
+    tap: { scale: prefersReducedMotion ? 1 : 0.98 },
   },
   
-  // Text reveal
+  // Text reveal with accessibility support
   textReveal: {
-    initial: { opacity: 0, y: 20 },
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
     animate: { opacity: 1, y: 0 },
   },
   
-  // Floating elements
+  // Floating elements with accessibility support
   float: {
-    animate: {
+    animate: prefersReducedMotion ? {
+      y: 0,
+      transition: { duration: 0.01 }
+    } : {
       y: [0, -8, 0],
       transition: {
         duration: 3,
