@@ -107,16 +107,19 @@ export default function App() {
     <main id="main-content" role="main">
       <PRDLandingPage
         onNavigateToSignup={() => navigate('/signup')}
-        onNavigateToLogin={() => navigate('/enhance')}
+        onNavigateToLogin={() => navigate('/login')}
       />
     </main>
   );
 
-  const EnhancePage = () => (
-    <main id="main-content" role="main">
-      <Dashboard2ProRedesigned />
-    </main>
-  );
+  const EnhancePage = () => {
+    if (!isAuthed) return <Navigate to="/login" replace />;
+    return (
+      <main id="main-content" role="main">
+        <Dashboard2ProRedesigned />
+      </main>
+    );
+  };
 
   const ProfilePage = () => {
     if (!isAuthed) return <Navigate to="/login" replace />;
