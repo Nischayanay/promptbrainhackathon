@@ -4,11 +4,6 @@
   "outputDirectory": "build",
   "framework": "vite",
   "installCommand": "npm ci",
-  "functions": {
-    "app/api/**/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
