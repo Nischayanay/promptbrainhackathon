@@ -18,7 +18,7 @@ import {
   Archive,
   MoreVertical
 } from "lucide-react";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 import { copyToClipboard } from '../../lib/clipboardUtils';
 import {
   DropdownMenu,

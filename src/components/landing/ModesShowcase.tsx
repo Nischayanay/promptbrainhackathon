@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { Edit3, Compass, Zap, ArrowRight } from "lucide-react";
 import { Card } from "../ui/card";

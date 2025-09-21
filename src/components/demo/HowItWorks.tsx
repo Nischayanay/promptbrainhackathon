@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { StepInput } from "./StepInput";
 import { StepProcessing } from "./StepProcessing";

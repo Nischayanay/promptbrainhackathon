@@ -5,9 +5,9 @@ import { SavedPrompts } from "./profile/SavedPrompts";
 import { Stats } from "./profile/Stats";
 import { Button } from "./ui/button";
 import { ArrowLeft, LogOut, Crown } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { signOut } from "../utils/auth";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 
 interface ProfileProps {
   onNavigateBack?: () => void;

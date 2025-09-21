@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Edit3, Zap, Copy, ArrowDown } from "lucide-react";
 
 export function HowItWorks() {

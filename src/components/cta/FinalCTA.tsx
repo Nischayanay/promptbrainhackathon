@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { motion, useInView, useAnimation } from "motion/react";
+import { motion, useInView, useAnimation } from "framer-motion";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { ArrowRight } from "lucide-react";
 

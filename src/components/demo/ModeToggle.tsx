@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { DemoMode } from "./HowItWorks";
 

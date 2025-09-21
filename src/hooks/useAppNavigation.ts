@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getCurrentSession, completeOnboarding } from "../utils/auth";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 
 type AppPage = 'landing' | 'login' | 'signup' | 'temple' | 'profile' | 'enhance';
 

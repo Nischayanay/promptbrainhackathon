@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 
 // Import GSAP with ScrollTrigger  

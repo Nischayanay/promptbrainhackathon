@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { User, Settings, LogOut, Crown } from "lucide-react";
 
 interface ProfileDropdownProps {

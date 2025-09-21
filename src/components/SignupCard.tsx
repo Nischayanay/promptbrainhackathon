@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Separator } from "./ui/separator";
 import { useState } from "react";
 import { signUp, signInWithGoogle, signInWithGitHub } from "../utils/auth";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 
 interface SignupCardProps {

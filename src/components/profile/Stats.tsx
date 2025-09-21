@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { TrendingUp, Zap, Brain, Target, Calendar, Award, Loader2, AlertCircle } from "lucide-react";
-import { motion, useAnimation } from "motion/react";
+import { motion, useAnimation } from "framer-motion";
 import { projectId, publicAnonKey } from "../../utils/supabase/info";
 import { getCurrentSession } from "../../utils/auth";
 

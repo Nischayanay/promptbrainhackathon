@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { motion, useInView, useAnimation } from "motion/react";
+import { motion, useInView, useAnimation } from "framer-motion";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { Instagram, Twitter, Linkedin, FileText, Shield, ArrowUp } from "lucide-react";
 

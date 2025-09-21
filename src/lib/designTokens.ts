@@ -50,7 +50,7 @@ export const designTokens = {
     
     // Line heights
     tight: 1.2,
-    normal: 1.4,
+    normalHeight: 1.4,
     relaxed: 1.6,
     
     // Font weights

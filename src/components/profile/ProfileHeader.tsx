@@ -5,8 +5,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { User, Mail, Edit3, Save, X, Lock, Eye, EyeOff } from "lucide-react";
-import { toast } from "sonner@2.0.3";
-import { motion } from "motion/react";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { getCurrentSession, getUserProfile, createOAuthProfile } from "../../utils/auth";
 
 interface ProfileHeaderProps {

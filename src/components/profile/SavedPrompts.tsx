@@ -5,8 +5,8 @@ import { Badge } from "../ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { BookOpen, Expand, Trash2, Copy, Calendar, Zap, Brain, Star, Loader2, AlertCircle } from "lucide-react";
-import { motion } from "motion/react";
-import { toast } from "sonner@2.0.3";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { projectId, publicAnonKey } from "../../utils/supabase/info";
 import { getCurrentSession } from "../../utils/auth";
 
