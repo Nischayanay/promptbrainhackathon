@@ -40,14 +40,36 @@ export function PromptEnhancer({ initialPrompt = '', selectedMode = 'general', o
     setIsEnhancing(true);
     setShowOutput(false);
 
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
+      const res = await fetch('http://localhost:8000/make-server-08c24b4c/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: selectedMode === 'product' ? 'flow' : 'direct', originalPrompt: inputPrompt })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const english = data?.enhancedPrompt?.english || data?.enhancedPrompt?.detailed || data?.enhancedPrompt?.short;
+        if (english) {
+          setEnhancedPrompt(english);
+          setIsEnhancing(false);
+          setShowOutput(true);
+          toast.success('Prompt enhanced successfully! ✨');
+          return;
+        }
+      }
+      // Fallback
       const mockEnhancement = generateMockEnhancement(inputPrompt, selectedMode);
       setEnhancedPrompt(mockEnhancement);
       setIsEnhancing(false);
       setShowOutput(true);
-      toast.success('Prompt enhanced successfully! ✨');
-    }, 2500);
+      toast.success('Prompt enhanced (local fallback). ✨');
+    } catch (e) {
+      const mockEnhancement = generateMockEnhancement(inputPrompt, selectedMode);
+      setEnhancedPrompt(mockEnhancement);
+      setIsEnhancing(false);
+      setShowOutput(true);
+      toast.success('Prompt enhanced (local fallback). ✨');
+    }
   };
 
   const generateMockEnhancement = (prompt: string, mode: string): string => {

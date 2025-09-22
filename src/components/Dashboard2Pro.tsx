@@ -181,16 +181,38 @@ export function Dashboard2Pro() {
     setIsEnhancing(true)
     setShowEffectOptions(false)
 
+    const payload: any = {
+      mode: activeMode === 'flow' ? 'flow' : 'direct',
+      originalPrompt: input.trim()
+    }
+
     try {
-      // Simulate API call with realistic delay
-      await new Promise(resolve => setTimeout(resolve, 1800))
+      const res = await fetch('http://localhost:8000/make-server-08c24b4c/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      let outputText = ''
+      if (res.ok) {
+        const data = await res.json()
+        outputText = data?.enhancedPrompt?.english
+          || data?.enhancedPrompt?.detailed
+          || data?.enhancedPrompt?.short
+          || ''
+      }
+
+      if (!outputText) {
+        // Fallback to local generator if server not reachable
+        outputText = generateEnhancedOutput(input, activeMode, effectType)
+      }
 
       const newMessage: ChatMessage = {
         id: Date.now().toString(),
         mode: activeMode,
         timestamp: new Date().toISOString(),
         input: input.trim(),
-        output: generateEnhancedOutput(input, activeMode, effectType),
+        output: outputText,
         title: `Enhanced ${activeMode === 'ideate' ? 'Idea' : 'Flow'} • ${effectType}`,
         effectType
       }
@@ -203,6 +225,18 @@ export function Dashboard2Pro() {
 
     } catch (error) {
       console.error('Enhancement failed:', error)
+      // Final fallback
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        mode: activeMode,
+        timestamp: new Date().toISOString(),
+        input: input.trim(),
+        output: generateEnhancedOutput(input, activeMode, effectType),
+        title: `Enhanced ${activeMode === 'ideate' ? 'Idea' : 'Flow'} • ${effectType}`,
+        effectType
+      }
+      setChatHistory(prev => [newMessage, ...prev])
+      setInput('')
     } finally {
       setIsEnhancing(false)
     }

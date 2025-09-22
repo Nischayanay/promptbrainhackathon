@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "react/jsx-runtime": "npm:react/jsx-runtime",
+    "react": "npm:react",
+    "react-dom": "npm:react-dom"
+  }
+}

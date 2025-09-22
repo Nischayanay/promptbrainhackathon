@@ -86,18 +86,19 @@ export function Dashboard2ProRedesigned() {
   }
 
   // Handle Flow mode progression
-  const handleFlowNext = () => {
+  const handleFlowNext = async () => {
     if (!canProceed()) return
     
     // Update current answer
     updateAnswer(flowState.currentStep, getCurrentAnswer())
     
     if (flowState.currentStep >= flowState.questions.length - 1) {
-      // Complete flow and prepare for enhancement
+      // Complete flow and enhance immediately in the same chat interface
       completeFlow()
       const structuredPrompt = getStructuredPrompt()
       setInput(structuredPrompt)
-      setActiveMode('ideate') // Switch back to ideate for enhancement
+      setActiveMode('ideate')
+      await enhancePrompt('enhance')
     } else {
       nextStep()
     }
@@ -128,16 +129,37 @@ export function Dashboard2ProRedesigned() {
       return
     }
 
+    const payload: any = {
+      mode: activeMode === 'flow' ? 'flow' : 'direct',
+      originalPrompt: input.trim()
+    }
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1200))
+      const res = await fetch('http://localhost:8000/make-server-08c24b4c/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      let outputText = ''
+      if (res.ok) {
+        const data = await res.json()
+        outputText = data?.enhancedPrompt?.english
+          || data?.enhancedPrompt?.detailed
+          || data?.enhancedPrompt?.short
+          || ''
+      }
+
+      if (!outputText) {
+        outputText = generateEnhancedOutput(input, activeMode, effectType)
+      }
 
       const newMessage: ChatMessage = {
         id: Date.now().toString(),
         mode: activeMode,
         timestamp: new Date().toISOString(),
         input: input.trim(),
-        output: generateEnhancedOutput(input, activeMode, effectType),
+        output: outputText,
         title: `Enhanced ${activeMode === 'ideate' ? 'Idea' : 'Flow'} • ${effectType}`
       }
 

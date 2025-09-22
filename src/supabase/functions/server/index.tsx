@@ -2,7 +2,7 @@ import { Hono } from "npm:hono";
 import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import { createClient } from "npm:@supabase/supabase-js";
-import * as kv from "./kv-utils.tsx";
+import * as kv from "./kv-utils.ts";
 
 // Cache for rulebook content
 let rulebookCache: string | null = null;
@@ -587,22 +587,26 @@ app.post("/make-server-08c24b4c/enhance-prompt", async (c) => {
       const enhancedContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (enhancedContent) {
-        // Parse enhanced content using rulebook format
-        const { short, detailed } = extractEnhancedPrompt(enhancedContent);
-        const jsonFormat = createJsonFormat(flowData, { short, detailed });
-        
+        // Parse enhanced content for ENGLISH + JSON; fallback to SHORT/DETAILED
+        const parsed = extractEnhanced(enhancedContent);
+        let english = parsed.english || parsed.detailed || parsed.short || '';
+        let jsonObj = parsed.json || buildSpecJson(flowData, english);
+        const jsonFormat = JSON.stringify(jsonObj, null, 2);
+
         console.log(`Prompt enhanced successfully using Gemini API with Rulebook`);
         
         // Track usage statistics if user is authenticated
         if (userId) {
-          await trackPromptEnhancement(userId, mode, originalPrompt, detailed);
+          await trackPromptEnhancement(userId, mode, originalPrompt, english);
         }
         
         return c.json({
           success: true,
           enhancedPrompt: {
-            short,
-            detailed
+            english,
+            // Back-compat fields if present
+            ...(parsed.short ? { short: parsed.short } : {}),
+            ...(parsed.detailed ? { detailed: parsed.detailed } : {})
           },
           jsonFormat,
           mode
@@ -646,49 +650,158 @@ async function loadRulebook(): Promise<string> {
   
   try {
     // First try to load from KV store (allows dynamic updates)
-    const storedRulebook = await kv.get('system:rulebook');
-    if (storedRulebook?.content) {
-      console.log('Loaded rulebook from KV store');
-      rulebookCache = storedRulebook.content;
-      rulebookCacheTime = now;
-      return rulebookCache;
+    try {
+      const storedRulebook = await kv.get('system:rulebook');
+      if (storedRulebook?.content) {
+        console.log('Loaded rulebook from KV store');
+        rulebookCache = storedRulebook.content;
+        rulebookCacheTime = now;
+        return rulebookCache;
+      }
+    } catch (kvErr) {
+      console.log('KV unavailable, falling back to filesystem rulebook');
     }
     
     // Fallback: try to read from file system
     try {
-      const rulebookContent = await Deno.readTextFile('./config/rulebook.md');
+      // Try multiple relative locations for development vs. bundled envs
+      const possiblePaths = [
+        './src/config/rulebook.md',
+        './config/rulebook.md',
+        '../config/rulebook.md',
+        '../../config/rulebook.md',
+        '../../../config/rulebook.md'
+      ];
+      let rulebookContent: string | null = null;
+      for (const p of possiblePaths) {
+        try {
+          rulebookContent = await Deno.readTextFile(p);
+          console.log(`Loaded rulebook from file system at ${p}`);
+          break;
+        } catch (_) {
+          // try next
+        }
+      }
+      if (!rulebookContent) throw new Error('Rulebook file not found');
       rulebookCache = rulebookContent;
-      console.log('Loaded rulebook from file system');
     } catch (readError) {
       // Final fallback: use embedded rulebook
       console.log('Using embedded fallback rulebook');
-      rulebookCache = `# PromptBrain Enhancement Rules
+      rulebookCache = `🧠 PromptBrain Backend Rulebook (Vanilla Logic)
+1. Core Philosophy
 
-## Core Principles
-- Expand vague inputs into clear, structured prompts
-- Add context: audience, purpose, format, tone  
-- Return both short (2-3 lines) and detailed (8-12 lines) versions
-- Adapt to mode: Content, Research, Product, Creative
-- Keep instructions actionable and specific
+Every raw prompt = incomplete instruction.
 
-## Mode-Specific Guidelines
-- **Content Creation**: Add audience, tone, length, SEO, outline
-- **Research**: Require citations, structured findings, pros/cons
-- **Product Specs**: Follow Problem → Solution → Features → Use Cases
-- **Creative**: Enhance imagery, narrative flow, character depth
+Backend logic = fill the gaps systematically using rules + frameworks.
 
-## Output Format
-ALWAYS return exactly this format:
-SHORT: [2-3 line enhanced prompt]
+Output must be CRISP: Clarity, Relevance, Intent alignment, Specificity, Precision.
 
-DETAILED: [8-12 line enhanced prompt with full context and structure]
+No randomness → Always structured, predictable improvement.
 
-## Quality Checklist
-- Preserve original intent
-- Add missing context
-- Make actionable and specific
-- Ensure professional tone
-- Include clear expected outcomes`;
+2. Enhancement Pipeline
+Raw Prompt → Context Expansion → Domain Detection → Framework Mapping → Enhancement → CRISP Validation → Final Output
+
+3. Context Expansion
+
+Whenever input is vague or underspecified, automatically enrich with:
+
+Role: Who is speaking? (teacher, marketer, coder, strategist, explainer)
+
+Task: What’s the user really asking for? (summary, code, pitch, essay, plan)
+
+Audience: Who is this meant for? (students, customers, devs, investors)
+
+Constraints: Tone, format, length, perspective.
+
+Examples: Add one illustrative example to ground the AI.
+
+4. Domain Detection
+
+Classifier routes prompt into buckets:
+
+Research / Knowledge → STAR, CRISP, SERP
+
+Marketing / Persuasion → AIDA, PAS, FAB
+
+Strategy / Planning → OSCAR, RASCE
+
+Explainer / Education → IEEI, STAR-simplified
+
+Creative Ideation → SCAMPER, lateral patterns
+
+Coding / Technical → RTF, stepwise RASCE
+
+5. Framework Mapping
+
+Each domain enforces a structure:
+
+Marketing → AIDA (hook → build interest → create desire → call-to-action)
+
+Research → STAR (Situation → Task → Action → Result)
+
+Strategy → RASCE (Role → Action → Steps → Constraints → Evaluation)
+
+Explainer → IEEI (Involve → Explain → Example → Involve again)
+
+Coding → RTF (Role → Task → Format, with explicit syntax rules)
+
+Creative → SCAMPER (Substitute, Combine, Adapt, Modify, Put to use, Eliminate, Reverse)
+
+6. Enhancement Rules
+
+If missing context → Insert defaults based on domain.
+
+If prompt is too broad → Narrow scope (timeframe, audience, purpose).
+
+If prompt is too short → Expand with task clarity + role + output format.
+
+If prompt is too long/unfocused → Split into modular sub-prompts.
+
+Always add actionability → “Do this step-by-step” or “Produce X in Y format.”
+
+7. CRISP Validation Layer
+
+Before sending back, every enhanced prompt must pass:
+
+Clarity → No vague phrases (“something,” “good,” “better”).
+
+Relevance → Directly tied to user’s goal.
+
+Intent alignment → Matches task type (ad copy ≠ essay tone).
+
+Specificity → Concrete details (audience, style, constraints).
+
+Precision → Output format enforced (bullets, JSON, table, etc.).
+
+8. Output Standard
+
+Two Formats Returned:
+
+Natural English prompt (human-friendly).
+
+JSON prompt object (machine-readable, reusable).
+
+Example JSON:
+
+{
+  "role": "Marketing strategist",
+  "task": "Write ad copy for coffee brand",
+  "audience": "Urban professionals 25–35",
+  "framework": "AIDA",
+  "format": "3 variations, each under 50 words",
+  "constraints": "Casual, witty tone",
+  "example": "Start with a hook about 'Monday mornings'"
+}
+
+9. Golden Rules (Backend)
+
+Never return “as is” raw text → always structured.
+
+Every enhancement adds context + structure + clarity.
+
+The same raw input → always produces the same structured upgrade.
+
+User can trust the machine: Predictable > Creative guessing.`;
     }
     
     rulebookCacheTime = now;
@@ -702,114 +815,96 @@ DETAILED: [8-12 line enhanced prompt with full context and structure]
 // Helper function to create Gemini prompt with rulebook integration
 async function createGeminiPrompt(mode: string, originalPrompt: string, flowData: any): Promise<string> {
   const rulebook = await loadRulebook();
-  
-  if (mode === 'flow') {
-    return `${rulebook}
 
-TASK: Apply the PromptBrain rulebook to enhance this user input.
+  const flowSpec = mode === 'flow' ? `\nFLOW SPECIFICATIONS:\n- Audience: ${flowData?.audience || 'General'}\n- Purpose: ${flowData?.purpose || 'General'}\n- Style: ${flowData?.style || 'Professional'}\n- Constraints: ${flowData?.constraints || 'None'}` : '';
 
-USER INPUT: "${originalPrompt || 'Create something based on the specifications'}"
-
-FLOW SPECIFICATIONS:
-- Audience: ${flowData.audience}
-- Purpose: ${flowData.purpose}  
-- Style: ${flowData.style}
-- Constraints: ${flowData.constraints || 'None'}
-
-INSTRUCTIONS: 
-1. Apply the rulebook principles above
-2. Create TWO versions as specified:
-   - Short (2-3 lines): Concise, clear version
-   - Detailed (8-12 lines): Full context, structured version
-3. Incorporate all flow specifications
-4. Ensure outputs are actionable and professional
-
-FORMAT YOUR RESPONSE EXACTLY AS:
-SHORT: [2-3 line enhanced prompt]
-
-DETAILED: [8-12 line enhanced prompt with full context and structure]`;
-  }
-  
-  // For direct/guided modes
   return `${rulebook}
 
-TASK: Apply the PromptBrain rulebook to enhance this user input.
+TASK: Enhance the RAW USER INPUT using the PromptBrain Backend Rulebook (Vanilla Logic).
 
-USER INPUT: "${originalPrompt}"
-MODE: ${mode}
+RAW USER INPUT: "${originalPrompt || ''}"\nMODE: ${mode.toUpperCase()}${flowSpec}
 
-INSTRUCTIONS:
-1. Apply the rulebook principles above
-2. Create TWO versions as specified:
-   - Short (2-3 lines): Concise, clear version  
-   - Detailed (8-12 lines): Full context, structured version
-3. Adapt tone and style for ${mode} mode
-4. Ensure outputs are actionable and professional
+REQUIREMENTS:\n- Perform Context Expansion (role, task, audience, constraints, example).\n- Detect Domain and choose a suitable Framework (e.g., AIDA, PAS, FAB, STAR, CRISP, RASCE, OSCAR, IEEI, RTF, SCAMPER).\n- Apply Enhancement Rules and run CRISP validation.\n- Return EXACTLY TWO outputs: (1) English enhanced prompt (single, human-friendly instruction), (2) JSON object with the fields below.\n
+OUTPUT FORMAT (STRICT):
+ENGLISH:
+[One enhanced instruction that includes role, task, audience, framework application, constraints, and any format/length requirements.]
 
-FORMAT YOUR RESPONSE EXACTLY AS:
-SHORT: [2-3 line enhanced prompt]
-
-DETAILED: [8-12 line enhanced prompt with full context and structure]`;
+JSON:
+{
+  "role": "...",
+  "task": "...",
+  "audience": "...",
+  "framework": "...",
+  "format": "...",
+  "constraints": "...",
+  "example": "..."
 }
 
-// Helper function to extract enhanced prompt from Gemini response
-function extractEnhancedPrompt(content: string): { short: string; detailed: string } {
+NOTES:\n- Keep the English prompt crisp and actionable.\n- Populate all JSON fields; use sensible defaults if missing.\n- Do NOT include any other sections or commentary.`;
+}
+
+// Helper: extract ENGLISH + JSON per new spec, with backward-compat for SHORT/DETAILED
+function extractEnhanced(content: string): { english?: string; json?: any; short?: string; detailed?: string } {
   try {
-    // Clean up the response
-    const cleanContent = content.trim()
-      .replace(/^```[\w]*\n?/, '')  // Remove opening code blocks
-      .replace(/\n?```$/, '')       // Remove closing code blocks;
-    
-    // Try to parse SHORT and DETAILED sections
-    const shortMatch = cleanContent.match(/SHORT:\s*(.*?)(?=\n\nDETAILED:|$)/s);
-    const detailedMatch = cleanContent.match(/DETAILED:\s*(.*?)$/s);
-    
+    const clean = content.trim()
+      .replace(/^```[\w]*\n?/, '')
+      .replace(/\n?```$/, '');
+
+    // Try ENGLISH/JSON format first
+    const englishMatch = clean.match(/ENGLISH:\s*([\s\S]*?)(?=\n\nJSON:|\nJSON:|$)/);
+    const jsonMatch = clean.match(/JSON:\s*\n?({[\s\S]*})/);
+
+    let english: string | undefined;
+    let jsonObj: any | undefined;
+
+    if (englishMatch) {
+      english = englishMatch[1].trim();
+    }
+    if (jsonMatch) {
+      const rawJson = jsonMatch[1];
+      try {
+        jsonObj = JSON.parse(rawJson);
+      } catch (_) {
+        // Attempt to fix common JSON fencing issues
+        const fixed = rawJson
+          .replace(/\n\s*```.*$/g, '')
+          .replace(/,(\s*[}\]])/g, '$1');
+        try { jsonObj = JSON.parse(fixed); } catch { /* ignore */ }
+      }
+    }
+
+    if (english || jsonObj) {
+      return { english, json: jsonObj };
+    }
+
+    // Backward compatibility: SHORT/DETAILED
+    const shortMatch = clean.match(/SHORT:\s*(.*?)(?=\n\nDETAILED:|$)/s);
+    const detailedMatch = clean.match(/DETAILED:\s*(.*?)$/s);
     if (shortMatch && detailedMatch) {
-      return {
-        short: shortMatch[1].trim(),
-        detailed: detailedMatch[1].trim()
-      };
+      return { short: shortMatch[1].trim(), detailed: detailedMatch[1].trim() };
     }
-    
-    // Fallback - try to split by paragraphs if format isn't followed
-    const paragraphs = cleanContent.split('\n\n').filter(p => p.trim());
-    if (paragraphs.length >= 2) {
-      return {
-        short: paragraphs[0].replace(/^SHORT:\s*/i, '').trim(),
-        detailed: paragraphs.slice(1).join('\n\n').replace(/^DETAILED:\s*/i, '').trim()
-      };
-    }
-    
-    // Last resort - use entire content as detailed, create short version
-    const shortVersion = cleanContent.split('.')[0] + '.';
-    return {
-      short: shortVersion.length > 150 ? cleanContent.substring(0, 150) + '...' : shortVersion,
-      detailed: cleanContent
-    };
-    
-  } catch (error) {
-    console.log(`Error parsing enhanced prompt: ${error}`);
-    return {
-      short: content.substring(0, 100) + '...',
-      detailed: content
-    };
+
+    // Fallback: first sentence and remainder
+    const firstSentence = clean.split(/(?<=[.!?])\s/)[0] || clean.slice(0, 150);
+    return { short: firstSentence, detailed: clean };
+  } catch (e) {
+    console.log(`extractEnhanced error: ${e}`);
+    return { detailed: content };
   }
 }
 
-// Helper function to create JSON format
-function createJsonFormat(flowData: any, enhancedPrompt: { short: string; detailed: string } | string): string {
-  const jsonData = {
+// Helper function to build JSON object per new spec when model JSON is absent
+function buildSpecJson(flowData: any, english: string): any {
+  // Very light heuristics to infer fields from english / flowData
+  return {
+    role: 'Strategist',
+    task: 'Enhance prompt',
     audience: flowData?.audience || 'General audience',
-    purpose: flowData?.purpose || 'General purpose', 
-    tone: flowData?.style || 'Professional',
-    constraints: flowData?.constraints || 'No specific constraints',
-    enhanced_prompt: typeof enhancedPrompt === 'string' ? {
-      short: enhancedPrompt.length > 150 ? enhancedPrompt.substring(0, 150) + '...' : enhancedPrompt,
-      detailed: enhancedPrompt
-    } : enhancedPrompt
+    framework: 'CRISP',
+    format: 'Clear, actionable instruction',
+    constraints: flowData?.constraints || 'None',
+    example: 'Provide one short example to ground the output'
   };
-  
-  return JSON.stringify(jsonData, null, 2);
 }
 
 // Helper function to track prompt enhancement usage
@@ -892,53 +987,44 @@ async function trackPromptEnhancement(userId: string, mode: string, originalProm
   }
 }
 
-// Helper function for local enhancement fallback
+// Helper function for local enhancement fallback (new spec)
 async function generateLocalEnhancement(c: any, mode: string, originalPrompt: string, flowData: any) {
   try {
-    // Apply basic rulebook principles even for local enhancement
-    const rulebook = await loadRulebook();
-    
-    let shortPrompt: string;
-    let detailedPrompt: string;
-    
-    if (mode === 'flow' && flowData) {
-      const audience = flowData.audience || 'general audience';
-      const purpose = flowData.purpose || 'general purpose';
-      const style = flowData.style || 'professional';
-      const constraints = flowData.constraints ? ` with constraints: ${flowData.constraints}` : '';
-      
-      shortPrompt = `Create a ${style.toLowerCase()} ${purpose.toLowerCase()} for ${audience.toLowerCase()}.`;
-      detailedPrompt = `Create a comprehensive ${style.toLowerCase()} ${purpose.toLowerCase()} specifically tailored for ${audience.toLowerCase()}. Ensure the content is well-structured, engaging, and meets professional standards${constraints}. Include clear objectives, actionable insights, and relevant examples where appropriate.`;
-    } else {
-      shortPrompt = originalPrompt ? 
-        `Enhanced: ${originalPrompt.substring(0, 100)}${originalPrompt.length > 100 ? '...' : ''}` :
-        'Create a comprehensive and well-structured response.';
-      
-      detailedPrompt = originalPrompt ? 
-        `Enhanced version: ${originalPrompt} - Optimized for clarity, specificity, and effectiveness. Provide structured information with clear headings, actionable insights, and relevant examples. Ensure the content is professional, engaging, and tailored to the intended audience.` :
-        'Create a comprehensive and well-structured response tailored to your specific needs. Include clear objectives, detailed explanations, and actionable recommendations.';
-    }
-    
-    const enhancedPrompt = { short: shortPrompt, detailed: detailedPrompt };
-    const jsonFormat = createJsonFormat(flowData, enhancedPrompt);
-    
+    const audience = (flowData?.audience || 'Urban professionals (25–35)');
+    const role = 'Marketing strategist';
+    const framework = 'AIDA';
+    const format = '3 variations, each under 40 words';
+    const constraints = (flowData?.constraints || 'Casual, witty tone');
+    const example = "Start with a hook about 'Monday mornings'";
+
+    const base = (originalPrompt && originalPrompt.trim()) || 'write ad copy for a coffee brand';
+
+    const english = `${role}. Write ad copy for: "${base}" targeting ${audience}. Apply ${framework}; output ${format}; ${constraints}. Include one Monday-morning hook.`;
+
+    const jsonObj = {
+      role,
+      task: 'Write 3 witty ad copies',
+      audience,
+      framework,
+      format,
+      constraints,
+      example
+    };
+
     return c.json({
       success: true,
-      enhancedPrompt,
-      jsonFormat,
+      enhancedPrompt: { english },
+      jsonFormat: JSON.stringify(jsonObj, null, 2),
       mode: mode || 'local'
     });
   } catch (error) {
     console.log(`Local enhancement error: ${error}`);
-    const fallbackPrompt = {
-      short: 'Create a clear and effective response.',
-      detailed: 'Create a comprehensive, well-structured response that addresses the user\'s needs with clarity and professionalism.'
-    };
-    
+    const english = 'You are a strategist. Create a crisp, actionable instruction with audience, framework, format, constraints, and one example.';
+    const jsonObj = buildSpecJson(flowData, english);
     return c.json({
       success: true,
-      enhancedPrompt: fallbackPrompt,
-      jsonFormat: createJsonFormat(flowData, fallbackPrompt),
+      enhancedPrompt: { english },
+      jsonFormat: JSON.stringify(jsonObj, null, 2),
       mode: 'fallback'
     });
   }
