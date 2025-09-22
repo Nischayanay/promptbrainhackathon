@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Zap, Sparkles, FileText, History, Settings, BarChart3, User, LogOut, RotateCcw, ThumbsUp, ThumbsDown, Clock, ChevronDown, ChevronRight, Brain, Crown } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
 type Mode = 'ideate' | 'flow'
 // Removed unused OutputFormat type
@@ -187,9 +188,18 @@ export function Dashboard2Pro() {
     }
 
     try {
-      const res = await fetch('http://localhost:8000/make-server-08c24b4c/enhance-prompt', {
+      // Get authentication token
+      const { data: { session } } = await supabase.auth.getSession()
+      const authHeader = session?.access_token 
+        ? `Bearer ${session.access_token}` 
+        : `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+
+      const res = await fetch('https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
         body: JSON.stringify(payload)
       })
 

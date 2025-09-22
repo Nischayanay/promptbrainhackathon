@@ -4,6 +4,7 @@ import { Sparkles, Copy, Save, Share2, RefreshCw, Zap, ArrowRight, CheckCircle, 
 import { useCreditSystem } from '../credits/CreditSystem';
 import { Button } from '../ui/button';
 import { toast } from 'sonner@2.0.3';
+import { supabase } from '../../lib/supabase';
 
 interface PromptEnhancerProps {
   initialPrompt?: string;
@@ -41,9 +42,18 @@ export function PromptEnhancer({ initialPrompt = '', selectedMode = 'general', o
     setShowOutput(false);
 
     try {
-      const res = await fetch('http://localhost:8000/make-server-08c24b4c/enhance-prompt', {
+      // Get authentication token
+      const { data: { session } } = await supabase.auth.getSession()
+      const authHeader = session?.access_token 
+        ? `Bearer ${session.access_token}` 
+        : `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+
+      const res = await fetch('https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
         body: JSON.stringify({ mode: selectedMode === 'product' ? 'flow' : 'direct', originalPrompt: inputPrompt })
       });
       if (res.ok) {

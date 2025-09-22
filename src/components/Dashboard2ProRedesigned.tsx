@@ -8,6 +8,7 @@ import { PromptConsole } from './Prompt/PromptConsole'
 import { FlowQuestionCard, FlowContextChips } from './Prompt/FlowQuestionCard'
 import { useFlowMode } from '../hooks/useFlowMode'
 import { designTokens } from '../lib/designTokens'
+import { supabase } from '../lib/supabase'
 
 type Mode = 'ideate' | 'flow'
 
@@ -135,9 +136,18 @@ export function Dashboard2ProRedesigned() {
     }
 
     try {
-      const res = await fetch('http://localhost:8000/make-server-08c24b4c/enhance-prompt', {
+      // Get authentication token
+      const { data: { session } } = await supabase.auth.getSession()
+      const authHeader = session?.access_token 
+        ? `Bearer ${session.access_token}` 
+        : `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+
+      const res = await fetch('https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
         body: JSON.stringify(payload)
       })
 
