@@ -562,7 +562,7 @@ app.post("/make-server-08c24b4c/enhance-prompt", async (c) => {
     // Prepare Gemini API request with rulebook integration
     const geminiPrompt = await createGeminiPrompt(mode, originalPrompt, flowData);
     
-    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -574,9 +574,9 @@ app.post("/make-server-08c24b4c/enhance-prompt", async (c) => {
           }]
         }],
         generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
+          temperature: 0,
+          topK: 1,
+          topP: 1,
           maxOutputTokens: 1024,
         }
       })
@@ -818,29 +818,7 @@ async function createGeminiPrompt(mode: string, originalPrompt: string, flowData
 
   const flowSpec = mode === 'flow' ? `\nFLOW SPECIFICATIONS:\n- Audience: ${flowData?.audience || 'General'}\n- Purpose: ${flowData?.purpose || 'General'}\n- Style: ${flowData?.style || 'Professional'}\n- Constraints: ${flowData?.constraints || 'None'}` : '';
 
-  return `${rulebook}
-
-TASK: Enhance the RAW USER INPUT using the PromptBrain Backend Rulebook (Vanilla Logic).
-
-RAW USER INPUT: "${originalPrompt || ''}"\nMODE: ${mode.toUpperCase()}${flowSpec}
-
-REQUIREMENTS:\n- Perform Context Expansion (role, task, audience, constraints, example).\n- Detect Domain and choose a suitable Framework (e.g., AIDA, PAS, FAB, STAR, CRISP, RASCE, OSCAR, IEEI, RTF, SCAMPER).\n- Apply Enhancement Rules and run CRISP validation.\n- Return EXACTLY TWO outputs: (1) English enhanced prompt (single, human-friendly instruction), (2) JSON object with the fields below.\n
-OUTPUT FORMAT (STRICT):
-ENGLISH:
-[One enhanced instruction that includes role, task, audience, framework application, constraints, and any format/length requirements.]
-
-JSON:
-{
-  "role": "...",
-  "task": "...",
-  "audience": "...",
-  "framework": "...",
-  "format": "...",
-  "constraints": "...",
-  "example": "..."
-}
-
-NOTES:\n- Keep the English prompt crisp and actionable.\n- Populate all JSON fields; use sensible defaults if missing.\n- Do NOT include any other sections or commentary.`;
+  return `SYSTEM PROMPT (PromptBrain 3.0 Rulebook):\n${rulebook}\n\nUSER PROMPT (to refine): "${originalPrompt || ''}"\nMODE: ${mode.toUpperCase()}${flowSpec}\n\nYou must produce exactly two sections in this order and nothing else.\n\nENGLISH:\n[One enhanced instruction that includes role, task, audience, selected framework, constraints, and explicit output format/length.]\n\nJSON:\n{\n  "role": "...",\n  "task": "...",\n  "audience": "...",\n  "framework": "...",\n  "format": "...",\n  "constraints": "...",\n  "example": "..."\n}`;
 }
 
 // Helper: extract ENGLISH + JSON per new spec, with backward-compat for SHORT/DETAILED
