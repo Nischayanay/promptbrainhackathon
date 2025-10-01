@@ -7,15 +7,23 @@ export type CreditsState = {
   isLow: boolean;
   canSpend: boolean;
   isLoading: boolean;
+  dailyRefresh?: {
+    credits_added: number;
+    refresh_type: 'initial' | 'daily' | 'none';
+    days_missed?: number;
+    next_refresh?: string;
+  };
   spend: (amount: number, reason?: string, promptId?: string) => Promise<boolean>;
   earn: (amount: number, reason?: string) => Promise<boolean>;
   refresh: () => Promise<void>;
+  manualRefresh: () => Promise<boolean>;
 };
 
 export function useCredits(): CreditsState {
   const [credits, setCredits] = React.useState<number>(0);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [userId, setUserId] = React.useState<string | null>(null);
+  const [dailyRefresh, setDailyRefresh] = React.useState<any>(null);
 
   // Track auth state
   React.useEffect(() => {
@@ -75,6 +83,9 @@ export function useCredits(): CreditsState {
       
       if (result.success) {
         setCredits(result.balance);
+        if (result.daily_refresh) {
+          setDailyRefresh(result.daily_refresh);
+        }
         return true;
       } else {
         console.error('Credit spend failed:', result.error);
@@ -150,6 +161,9 @@ export function useCredits(): CreditsState {
       
       if (result.success) {
         setCredits(result.balance);
+        if (result.daily_refresh) {
+          setDailyRefresh(result.daily_refresh);
+        }
       } else {
         console.error('Balance fetch failed:', result.error);
         setCredits(0);
@@ -162,7 +176,37 @@ export function useCredits(): CreditsState {
     }
   }, [userId]);
 
-  return { credits, isLow, canSpend, isLoading, spend, earn, refresh };
+  const manualRefresh = React.useCallback(async (): Promise<boolean> => {
+    if (!userId) return false;
+
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session?.access_token) return false;
+
+      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/credits/refresh`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.session.access_token}`,
+        }
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setCredits(result.balance);
+        setDailyRefresh(result);
+        return true;
+      } else {
+        console.error('Manual refresh failed:', result.error);
+        return false;
+      }
+    } catch (error) {
+      console.error('Manual refresh error:', error);
+      return false;
+    }
+  }, [userId]);
+
+  return { credits, isLow, canSpend, isLoading, dailyRefresh, spend, earn, refresh, manualRefresh };
 }
 
 

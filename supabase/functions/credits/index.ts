@@ -46,8 +46,32 @@ serve(async (req) => {
     switch (method) {
       case 'GET':
         if (action === 'balance') {
-          // Get user balance
+          // Get user balance (automatically refreshes daily credits)
           const { data, error } = await supabaseClient.rpc('get_user_balance', {
+            p_user_id: user.id
+          })
+
+          if (error) {
+            return new Response(
+              JSON.stringify({ error: error.message }),
+              { 
+                status: 500, 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+              }
+            )
+          }
+
+          return new Response(
+            JSON.stringify(data),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
+        }
+
+        if (action === 'refresh') {
+          // Manually refresh daily credits
+          const { data, error } = await supabaseClient.rpc('refresh_daily_credits', {
             p_user_id: user.id
           })
 
@@ -74,7 +98,7 @@ serve(async (req) => {
         const body = await req.json()
 
         if (action === 'spend') {
-          // Spend credits
+          // Spend credits (automatically refreshes daily credits first)
           const { prompt_id, amount = 1, reason = 'prompt_enhancement' } = body
 
           const { data, error } = await supabaseClient.rpc('spend_credits', {

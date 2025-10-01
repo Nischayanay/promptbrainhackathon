@@ -36,7 +36,7 @@ export function Dashboard2ProRedesigned() {
   const [activeNavItem, setActiveNavItem] = useState('enhance')
   
   // Credits system (server-authoritative)
-  const { credits, canSpend, isLoading: creditsLoading, spend, earn } = useCredits()
+  const { credits, canSpend, isLoading: creditsLoading, dailyRefresh, spend, earn, manualRefresh } = useCredits()
 
   // Restore and persist chat history
   useEffect(() => {
@@ -205,7 +205,10 @@ export function Dashboard2ProRedesigned() {
 
   // Handle insufficient credits
   const handleAddCredits = async () => {
-    await earn(10, 'daily_bonus')
+    const refreshed = await manualRefresh()
+    if (!refreshed) {
+      await earn(10, 'daily_bonus')
+    }
   }
 
   // Navigation handlers
@@ -264,6 +267,26 @@ export function Dashboard2ProRedesigned() {
         </div>
       )}
       
+      {/* Daily Credits Refresh Notification */}
+      {!creditsLoading && dailyRefresh && dailyRefresh.credits_added > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="sticky top-0 z-40 border-b text-sm px-4 py-2"
+          style={{
+            backgroundColor: `${designTokens.colors.brandGold}20`,
+            borderColor: `${designTokens.colors.brandGold}40`,
+            color: designTokens.colors.textPrimary
+          }}
+        >
+          <span className="font-medium">🎉 Daily Credits Refreshed!</span> 
+          {' '}+{dailyRefresh.credits_added} credits added. 
+          {dailyRefresh.days_missed > 1 && ` (${dailyRefresh.days_missed} days worth)`}
+          {' '}Current balance: {credits} credits.
+        </motion.div>
+      )}
+
       {/* Credits Loading State */}
       {creditsLoading && (
         <div 
