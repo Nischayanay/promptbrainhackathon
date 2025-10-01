@@ -35,8 +35,8 @@ export function Dashboard2ProRedesigned() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [activeNavItem, setActiveNavItem] = useState('enhance')
   
-  // Credits system (unified hook)
-  const { credits, canSpend, spend, earn } = useCredits(50)
+  // Credits system (server-authoritative)
+  const { credits, canSpend, isLoading: creditsLoading, spend, earn } = useCredits()
 
   // Restore and persist chat history
   useEffect(() => {
@@ -123,7 +123,11 @@ export function Dashboard2ProRedesigned() {
 
     setIsEnhancing(true)
     setAnnouncement('Enhancement started...')
-    const spent = spend(1, 'enhance')
+    
+    // Generate prompt ID for audit trail
+    const promptId = crypto.randomUUID()
+    
+    const spent = await spend(1, 'prompt_enhancement', promptId)
     if (!spent) {
       setIsEnhancing(false)
       setAnnouncement('Insufficient credits to enhance prompt')
@@ -165,7 +169,7 @@ export function Dashboard2ProRedesigned() {
       }
 
       const newMessage: ChatMessage = {
-        id: Date.now().toString(),
+        id: promptId,
         mode: activeMode,
         timestamp: new Date().toISOString(),
         input: input.trim(),
@@ -180,6 +184,9 @@ export function Dashboard2ProRedesigned() {
     } catch (error) {
       console.error('Enhancement failed:', error)
       setAnnouncement('Enhancement failed. Please try again.')
+      
+      // Rollback credit deduction on failure
+      await earn(1, 'enhancement_failed_rollback')
     } finally {
       setIsEnhancing(false)
     }
@@ -197,8 +204,8 @@ export function Dashboard2ProRedesigned() {
   }
 
   // Handle insufficient credits
-  const handleAddCredits = () => {
-    earn(10, 'bonus')
+  const handleAddCredits = async () => {
+    await earn(10, 'daily_bonus')
   }
 
   // Navigation handlers
@@ -242,7 +249,7 @@ export function Dashboard2ProRedesigned() {
       </div>
 
       {/* Low Credits Banner with improved accessibility */}
-      {credits < 5 && (
+      {!creditsLoading && credits < 5 && (
         <div 
           role="alert"
           aria-live="assertive"
@@ -254,6 +261,20 @@ export function Dashboard2ProRedesigned() {
           }}
         >
           <span className="font-medium">Low credits warning:</span> You have {credits} credits remaining. Earn more or upgrade to continue enhancing.
+        </div>
+      )}
+      
+      {/* Credits Loading State */}
+      {creditsLoading && (
+        <div 
+          className="sticky top-0 z-40 border-b text-sm px-4 py-2"
+          style={{
+            backgroundColor: `${designTokens.colors.glass}20`,
+            borderColor: `${designTokens.colors.glassBorder}40`,
+            color: designTokens.colors.textMuted
+          }}
+        >
+          Loading credits balance...
         </div>
       )}
       <AppShell

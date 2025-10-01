@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Copy, Save, Share2, RefreshCw, Zap, ArrowRight, CheckCircle, ExternalLink } from 'lucide-react';
-import { useCreditSystem } from '../credits/CreditSystem';
+import { useCredits } from '../../lib/credits';
 import { Button } from '../ui/button';
 import { toast } from 'sonner@2.0.3';
 import { supabase } from '../../lib/supabase';
@@ -19,7 +19,7 @@ export function PromptEnhancer({ initialPrompt = '', selectedMode = 'general', o
   const [showOutput, setShowOutput] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   
-  const { credits, spendCredits, isLowOnCredits } = useCreditSystem();
+  const { credits, canSpend, isLoading: creditsLoading, spend } = useCredits();
 
   const placeholderExamples = {
     general: "Write me a pitch for my startup",
@@ -33,7 +33,9 @@ export function PromptEnhancer({ initialPrompt = '', selectedMode = 'general', o
       return;
     }
 
-    if (!spendCredits(1, `Enhanced prompt: ${inputPrompt.slice(0, 30)}...`)) {
+    const promptId = crypto.randomUUID();
+    const spent = await spend(1, 'prompt_enhancement', promptId);
+    if (!spent) {
       toast.error('Not enough credits! Earn more by using the app daily.');
       return;
     }
@@ -214,8 +216,9 @@ Please ensure the output is immediately actionable and professionally formatted 
     }
   };
 
-  const retryEnhancement = () => {
-    if (!spendCredits(1, `Re-enhanced prompt: ${inputPrompt.slice(0, 30)}...`)) {
+  const retryEnhancement = async () => {
+    const spent = await spend(1, 'prompt_retry');
+    if (!spent) {
       toast.error('Not enough credits! Earn more by using the app daily.');
       return;
     }
@@ -255,7 +258,7 @@ Please ensure the output is immediately actionable and professionally formatted 
             >
               <Button
                 onClick={enhancePrompt}
-                disabled={isEnhancing || isLowOnCredits}
+                disabled={isEnhancing || !canSpend || creditsLoading}
                 className="bg-gradient-to-r from-royal-gold to-cyan-glow text-temple-black font-medium hover:opacity-90 disabled:opacity-50"
               >
                 {isEnhancing ? (
@@ -275,14 +278,14 @@ Please ensure the output is immediately actionable and professionally formatted 
           )}
         </div>
 
-        {isLowOnCredits && (
+        {!canSpend && !creditsLoading && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="p-3 bg-soft-red/10 border border-soft-red/30 rounded-lg"
           >
             <p className="text-sm text-soft-red">
-              Running low on credits! Use the app daily or invite friends to earn more.
+              No credits remaining! Use the app daily or invite friends to earn more.
             </p>
           </motion.div>
         )}
