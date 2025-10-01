@@ -117,14 +117,13 @@ export function Dashboard2ProRedesigned() {
     updateAnswer(flowState.currentStep, answer)
   }
 
-  // Enhancement logic with accessibility announcements
+  // Direct Backend Brain Integration
   const enhancePrompt = async (effectType = 'enhance') => {
     if (!input.trim() || isEnhancing || !canSpend) return
 
     setIsEnhancing(true)
-    setAnnouncement('Enhancement started...')
+    setAnnouncement('🧠 Backend Brain is analyzing your prompt...')
     
-    // Generate prompt ID for audit trail
     const promptId = crypto.randomUUID()
     
     const spent = await spend(1, 'prompt_enhancement', promptId)
@@ -134,59 +133,64 @@ export function Dashboard2ProRedesigned() {
       return
     }
 
-    const payload: any = {
-      mode: activeMode === 'flow' ? 'flow' : 'direct',
-      originalPrompt: input.trim()
-    }
-
     try {
-      // Get authentication token
-      const { data: { session } } = await supabase.auth.getSession()
-      const authHeader = session?.access_token 
-        ? `Bearer ${session.access_token}` 
-        : `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-
-      const res = await fetch('https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt', {
+      // Direct Backend Brain API call with service role key
+      const response = await fetch('https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/backend-brain-enhance', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': authHeader
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwMDc3OSwiZXhwIjoyMDY1NDc2Nzc5fQ.mthkPFNO0QfH02TiHoA5lHbBZ02fUX2YZQGkMS4kGpc'}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDA3NzksImV4cCI6MjA2NTQ3Njc3OX0.Hs_rJaWcELKEBYjRQKKmLfJCcgqGJhFJvJQGJhFJvJQ'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          prompt: input.trim(),
+          options: {
+            includeExamples: true,
+            maxTokens: 2000
+          }
+        })
       })
 
-      let outputText = ''
-      if (res.ok) {
-        const data = await res.json()
-        outputText = data?.enhancedPrompt?.english
-          || data?.enhancedPrompt?.detailed
-          || data?.enhancedPrompt?.short
-          || ''
+      if (!response.ok) {
+        throw new Error(`Backend Brain API error: ${response.status}`)
       }
 
-      if (!outputText) {
-        outputText = generateEnhancedOutput(input, activeMode, effectType)
+      const data = await response.json()
+      
+      if (!data.success || !data.data) {
+        throw new Error(data.error?.message || 'Backend Brain enhancement failed')
       }
 
+      // Extract Backend Brain results
+      const {
+        enhancedText,
+        qualityScore,
+        whySummary,
+        metadata: { enhancementRatio, domainConfidence, processingTime, totalTokens }
+      } = data.data
+
+      // Create enhanced message with Backend Brain output
       const newMessage: ChatMessage = {
         id: promptId,
         mode: activeMode,
         timestamp: new Date().toISOString(),
         input: input.trim(),
-        output: outputText,
-        title: `Enhanced ${activeMode === 'ideate' ? 'Idea' : 'Flow'} • ${effectType}`
+        output: `🧠 **Backend Brain Enhanced Prompt**\n\n${enhancedText}\n\n---\n\n💡 **Why This Enhancement Works:**\n${whySummary}\n\n📊 **Performance Metrics:**\n• Quality Score: ${(qualityScore * 100).toFixed(0)}%\n• Enhancement Ratio: ${enhancementRatio.toFixed(1)}x\n• Domain Confidence: ${(domainConfidence * 100).toFixed(0)}%\n• Processing Time: ${processingTime}ms\n• Tokens: ${totalTokens}`,
+        title: `🧠 Backend Brain Enhanced • ${(qualityScore * 100).toFixed(0)}% Quality • ${enhancementRatio.toFixed(1)}x Enhancement`,
+        effectType: 'backend-brain'
       }
 
       setChatHistory(prev => [newMessage, ...prev])
       setInput('')
-      setAnnouncement(`Prompt enhanced successfully! ${credits - 1} credits remaining.`)
+      setAnnouncement(`🎉 Backend Brain enhancement complete! Quality: ${(qualityScore * 100).toFixed(0)}%, Enhancement: ${enhancementRatio.toFixed(1)}x. ${credits - 1} credits remaining.`)
 
     } catch (error) {
-      console.error('Enhancement failed:', error)
-      setAnnouncement('Enhancement failed. Please try again.')
+      console.error('Backend Brain failed:', error)
       
-      // Rollback credit deduction on failure
+      // Rollback credits and show error
       await earn(1, 'enhancement_failed_rollback')
+      setAnnouncement(`❌ Backend Brain enhancement failed: ${error.message}. Credits refunded.`)
+      
     } finally {
       setIsEnhancing(false)
     }
