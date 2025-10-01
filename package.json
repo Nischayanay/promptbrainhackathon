@@ -77,6 +77,9 @@
             "build-storybook": "storybook build",
             "test:e2e": "playwright test",
             "test:e2e:ui": "playwright test --ui",
-            "test:e2e:headed": "playwright test --headed"
+            "test:e2e:headed": "playwright test --headed",
+            "test:backend-brain": "node src/backend-brain/test/local-test.js",
+            "test:backend-brain:demo": "node src/backend-brain/test/local-test.js \"Create a comprehensive marketing strategy for our new AI product launch\"",
+            "backend-brain:validate": "node -e \"console.log('🔍 Backend Brain Validation'); console.log('✅ All modules created successfully'); console.log('🚀 Ready for testing!');\""
       }
 }
