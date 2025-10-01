@@ -1,0 +1,88 @@
+PromptBrain 3.0 Backend Test PRD
+1. Overview
+
+PromptBrain 3.0 backend refines raw prompts in Ideate Mode (and other modes) using hidden system prompts (rulebook) and Gemini API. Users must receive predictable, CRISP outputs in the same chat bubble.
+
+This test PRD ensures:
+
+Gemini integration is stable
+
+Rulebook logic is applied correctly
+
+Outputs are validated (CRISP standards)
+
+UI/UX receives clean, in-place responses
+
+2. Test Objectives
+
+Validate raw input processing pipeline.
+
+Confirm system prompt/rulebook is hidden.
+
+Ensure Gemini refinement produces expected structured outputs.
+
+Test CRISP validation layer: Clarity, Relevance, Intent, Specificity, Precision.
+
+Verify chat interface delivery: same bubble, typewriter animation, highlights.
+
+Check error handling and fallback logic.
+
+Test history, undo, and copy/save actions.
+
+3. Backend Test Cases
+#	Test Case	Input	Expected Output	Notes
+1	Empty Input	""	Error toast: "Add more context to refine better"	Input validation layer
+2	Short Prompt	"Coffee ad"	Expanded prompt with Role, Task, Audience, Constraints	Context Expansion test
+3	Broad Prompt	"Write something for marketing"	Narrowed scope + modular sub-prompts	Enhancement engine
+4	Domain Detection	"Explain blockchain to beginners"	Domain = Explainer → Framework = IEEI	Classifier accuracy
+5	Framework Mapping	"Write ad copy"	Framework = AIDA, JSON & human-friendly output	Mapping correctness
+6	CRISP Validation	Prompt missing details	Re-process until Clarity, Relevance, Intent, Specificity, Precision met	Validation layer
+7	Gemini Failure / Timeout	API returns error or null	Retry 1-2 times → fallback enrichment internally → notify user if unresolved	Resilience & retry logic
+8	Output Format	"Generate email campaign"	Human-readable + JSON object	Ensure both returned, correct fields
+9	Same Bubble Delivery	"Idea prompt"	Refined output replaces shimmer in input bubble	UX integration test
+10	Copy / Save Actions	After refinement	Copy button triggers toast Copied!, Save stores prompt in DB	Micro-interaction feedback
+11	History / Undo	Multiple refinements	Last 5 refined prompts stored, undo restores previous	State management
+12	Long Input Handling	500+ words	Split into modular sub-prompts, structured outputs	Enhancement engine scalability
+13	Invalid JSON Output from Gemini	{} or broken	Detect & regenerate internally	CRISP validation fallback
+14	Mobile / Responsive	Input/output on mobile	Bubbles stack, buttons full-width, shimmer scales	Frontend-backend integration
+4. Integration & Regression Tests
+
+API Integration: Ensure backend communicates properly with Gemini API.
+
+Rulebook Integrity: Test updates to hidden system prompts do not leak or overwrite outputs.
+
+Mode Switching: Ensure switching between Ideate / Research / Marketing modes applies correct frameworks.
+
+Database Logging: Each prompt and refinement saved correctly (user ID, timestamp, mode, JSON output).
+
+Stress Test: Simulate 100 concurrent refinements → backend does not crash, latency < 3s.
+
+5. Error & Recovery Handling
+
+Gemini API Error → retry 2x → internal fallback → notify user.
+
+Validation Failure → log error → reprocess with additional context.
+
+Timeouts → return microcopy in chat: "Refinement taking longer than expected…"
+
+Malformed Input → prevent sending to Gemini, prompt user.
+
+6. Logging & Monitoring
+
+Log raw input, enriched prompt, Gemini output, final validated output.
+
+Include timestamps, user ID, mode, refinement step for debugging.
+
+Alerts for repeated Gemini failures or CRISP validation failures.
+
+7. Success Criteria
+
+All test cases pass consistently without exposing system prompt.
+
+All refined outputs meet CRISP standards.
+
+Same-bubble delivery works in all tested devices/screens.
+
+Retry/fallback logic resolves >95% of Gemini errors automatically.
+
+History, copy, save, undo features function reliably.
