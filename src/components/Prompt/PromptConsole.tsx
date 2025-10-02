@@ -404,46 +404,7 @@ export function PromptConsole({
         </AnimatePresence>
       </div>
 
-      {/* Suggestions - Only show when empty and not focused */}
-      <div className="mt-6 min-h-[56px]">
-        <AnimatePresence>
-          {!input && !isFocused && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ delay: 0.3 }}
-              className="flex flex-wrap gap-3 justify-center"
-            >
-              {[
-                "Write a landing page for a SaaS product",
-                "Create a marketing email sequence", 
-                "Design a user onboarding flow",
-                "Generate social media content",
-                "Build a product launch strategy"
-              ].map((suggestion, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => setInput(suggestion)}
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className="
-                    px-4 py-2 text-sm text-text-muted hover:text-text-primary 
-                    glass-panel hover:bg-glass-border rounded-xl transition-all duration-200
-                    border border-glass-border hover:border-brand-gold/30
-                    premium-focus
-                  "
-                >
-                  {suggestion}
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+
     </motion.div>
   )
 }

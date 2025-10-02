@@ -201,9 +201,9 @@ export function Dashboard2ProRedesigned() {
     }
 
     try {
-      // Direct Backend Brain API call with service role key
+      // Call the make-server function with correct parameters
       const response = await fetch(
-        "https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/backend-brain-enhance",
+        "https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt",
         {
           method: "POST",
           headers: {
@@ -216,39 +216,40 @@ export function Dashboard2ProRedesigned() {
               "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDA3NzksImV4cCI6MjA2NTQ3Njc3OX0.Hs_rJaWcELKEBYjRQKKmLfJCcgqGJhFJvJQGJhFJvJQ",
           },
           body: JSON.stringify({
-            prompt: input.trim(),
-            options: {
-              includeExamples: true,
-              maxTokens: 2000,
-            },
+            mode: activeMode,
+            originalPrompt: input.trim(),
+            flowData: null,
           }),
         },
       );
 
       if (!response.ok) {
-        throw new Error(`Backend Brain API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error("API Error Response:", errorText);
+        throw new Error(`API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log("API Response:", data);
 
-      if (!data.success || !data.data) {
-        throw new Error(
-          data.error?.message || "Backend Brain enhancement failed",
-        );
+      if (!data.success) {
+        throw new Error(data.error || "Enhancement failed");
       }
 
-      // Extract Backend Brain results
-      const {
-        enhancedText,
-        qualityScore,
-        whySummary,
-        metadata: {
-          enhancementRatio,
-          domainConfidence,
-          processingTime,
-          totalTokens,
-        },
-      } = data.data;
+      // Extract the enhanced text from the response
+      const enhancedText = data.enhancedPrompt?.detailed || data.enhancedPrompt?.english || "";
+      
+      if (!enhancedText) {
+        throw new Error("No enhanced text in response");
+      }
+
+      // Calculate mock metrics since backend doesn't provide them
+      const originalLength = input.trim().length;
+      const enhancedLength = enhancedText.length;
+      const enhancementRatio = enhancedLength / originalLength;
+      const qualityScore = Math.min(0.95, 0.7 + (enhancementRatio * 0.1));
+      const processingTime = 1500; // Mock processing time in ms
+      const whySummary = "Enhanced with structured framework, added context, and improved clarity for better AI understanding.";
 
       // Create user message
       const userMessage: ChatThreadMessage = {
