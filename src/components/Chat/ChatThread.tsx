@@ -12,7 +12,7 @@ import {
   Waves
 } from 'lucide-react'
 import { Button } from '../ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../ui/tooltip'
 
 export interface ChatMessage {
   id: string
@@ -311,13 +311,14 @@ export function ChatThread({
   }
 
   return (
-    <div className={`chat-thread space-y-6 ${className}`}>
-      <AnimatePresence mode="popLayout">
-        {messages.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            onAction={(action) => handleMessageAction(message.id, action)}
+    <TooltipProvider>
+      <div className={`chat-thread space-y-6 ${className}`}>
+        <AnimatePresence mode="popLayout">
+          {messages.map((message) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              onAction={(action) => handleMessageAction(message.id, action)}
             onRate={(rating) => handleRateMessage(message.id, rating)}
           />
         ))}
@@ -325,5 +326,6 @@ export function ChatThread({
         {isLoading && <LoadingMessage key="loading" />}
       </AnimatePresence>
     </div>
+    </TooltipProvider>
   )
 }
