@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { motion } from 'framer-motion'
+import ElectricBorder from '../ui/ElectricBorder'
 
 interface AppShellProps {
   children: ReactNode
@@ -95,12 +96,23 @@ export function AppShellHero({
       className={`text-center mb-8 lg:mb-12 ${className}`}
     >
       {title && (
-        <h1 className="
-          font-display text-4xl sm:text-5xl lg:text-6xl font-semibold 
-          text-text-primary mb-4 tracking-tight
-        ">
-          {title}
-        </h1>
+        <div className="mb-6 flex justify-center">
+          <ElectricBorder 
+            color="#00d4ff" 
+            intensity={1.2} 
+            speed={1.5}
+            className="inline-block"
+          >
+            <h1 className="
+              font-display text-4xl sm:text-5xl lg:text-6xl font-semibold 
+              text-text-primary tracking-tight
+              bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent
+              px-2 py-1
+            ">
+              {title}
+            </h1>
+          </ElectricBorder>
+        </div>
       )}
       
       {subtitle && (

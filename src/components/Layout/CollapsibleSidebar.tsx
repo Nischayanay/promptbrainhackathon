@@ -11,6 +11,8 @@ import {
   Home,
   Zap
 } from 'lucide-react'
+import { Button } from '../ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../ui/tooltip'
 
 interface SidebarItem {
   id: string
@@ -118,14 +120,14 @@ export function CollapsibleSidebar({
     collapsed: { 
       width: 'var(--sidebar-width-collapsed)',
       transition: { 
-        duration: 0.22, 
+        duration: 0.12, 
         ease: [0.2, 0.9, 0.2, 1] 
       }
     },
     expanded: { 
       width: 'var(--sidebar-width-expanded)',
       transition: { 
-        duration: 0.32, 
+        duration: 0.14, 
         ease: [0.2, 0.9, 0.2, 1] 
       }
     }
@@ -135,266 +137,284 @@ export function CollapsibleSidebar({
     collapsed: { 
       opacity: 0,
       x: -10,
-      transition: { duration: 0.15 }
+      transition: { duration: 0.08 }
     },
     expanded: { 
       opacity: 1,
       x: 0,
-      transition: { duration: 0.25, delay: 0.1 }
+      transition: { duration: 0.12, delay: 0.05 }
     }
   }
 
   return (
-    <motion.div
-      variants={sidebarVariants}
-      animate={collapsed ? 'collapsed' : 'expanded'}
-      className={`
-        relative h-screen glass-panel-strong
-        border-r border-glass-border
-        ${className}
-      `}
-      style={{ minWidth: collapsed ? '72px' : '260px' }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-glass-border">
-        <AnimatePresence mode="wait">
-          {!collapsed && (
+    <TooltipProvider>
+      <motion.div
+        variants={sidebarVariants}
+        animate={collapsed ? 'collapsed' : 'expanded'}
+        className={`
+          relative h-screen glass-panel-strong
+          border-r border-glass-border
+          ${className}
+        `}
+        style={{ minWidth: collapsed ? '72px' : '260px' }}
+        role="navigation"
+        aria-label="Main navigation"
+        aria-expanded={!collapsed}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-3 border-b border-glass-border">
+          <AnimatePresence mode="wait">
+            {!collapsed && (
+              <motion.div
+                variants={contentVariants}
+                initial="collapsed"
+                animate="expanded"
+                exit="collapsed"
+                className="flex items-center space-x-2"
+              >
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-gold to-yellow-500 flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-black" />
+                </div>
+                <span className="text-text-primary font-semibold text-sm">
+                  PromptBrain
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggle}
+                className="h-8 w-8 text-text-muted hover:text-text-primary hover:bg-glass"
+                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              >
+                <motion.div
+                  animate={{ rotate: collapsed ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </motion.div>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>{collapsed ? 'Expand' : 'Collapse'} sidebar (⌘B)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-3 space-y-1" role="menu" aria-label="Navigation menu">
+          {navigationItems.map((item, index) => {
+            const Icon = item.icon
+            const isActive = activeItem === item.id
+            const isHovered = hoveredItem === item.id
+
+            return collapsed ? (
+              <Tooltip key={item.id}>
+                <TooltipTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onItemSelect(item.id)}
+                      onMouseEnter={() => setHoveredItem(item.id)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      className={`
+                        relative w-full h-12 rounded-lg
+                        ${isActive 
+                          ? 'text-text-primary bg-glass-border' 
+                          : 'text-text-muted hover:text-text-primary hover:bg-glass'
+                        }
+                      `}
+                      role="menuitem"
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      {/* Active indicator */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeIndicator"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-gold rounded-r-full"
+                          initial={false}
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        />
+                      )}
+
+                      {/* Icon with glow effect */}
+                      <div className="relative">
+                        <Icon className="w-4 h-4 relative z-10" />
+                        {(isActive || isHovered) && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 0.3 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            className="absolute inset-0 bg-brand-gold rounded-full blur-sm"
+                          />
+                        )}
+                      </div>
+                    </Button>
+                  </motion.div>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <div className="text-sm font-medium">{item.label}</div>
+                  <div className="text-xs text-muted-foreground">{item.description}</div>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <motion.div
+                key={item.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  variant="ghost"
+                  onClick={() => onItemSelect(item.id)}
+                  onMouseEnter={() => setHoveredItem(item.id)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  className={`
+                    relative w-full justify-start space-x-3 h-12 rounded-lg px-3
+                    ${isActive 
+                      ? 'text-text-primary bg-glass-border' 
+                      : 'text-text-muted hover:text-text-primary hover:bg-glass'
+                    }
+                  `}
+                  role="menuitem"
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {/* Active indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-gold rounded-r-full"
+                      initial={false}
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+
+                  {/* Icon with glow effect */}
+                  <div className="relative">
+                    <Icon className="w-4 h-4 relative z-10" />
+                    {(isActive || isHovered) && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 0.3 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        className="absolute inset-0 bg-brand-gold rounded-full blur-sm"
+                      />
+                    )}
+                  </div>
+
+                  {/* Label */}
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      variants={contentVariants}
+                      initial="collapsed"
+                      animate="expanded"
+                      exit="collapsed"
+                      className="relative z-10"
+                    >
+                      {item.label}
+                    </motion.span>
+                  </AnimatePresence>
+                </Button>
+              </motion.div>
+            )
+          })}
+        </nav>
+
+        {/* Recent History - Only show when expanded */}
+        <AnimatePresence>
+          {!collapsed && recentHistory.length > 0 && (
             <motion.div
               variants={contentVariants}
               initial="collapsed"
               animate="expanded"
               exit="collapsed"
-              className="flex items-center space-x-2"
+              className="p-3 border-t border-glass-border"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-gold to-yellow-500 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-black" />
+              <div className="text-xs font-medium text-text-muted mb-2 px-3">
+                Recent
               </div>
-              <span className="text-text-primary font-semibold text-sm">
-                PromptBrain
-              </span>
+              <div className="space-y-1">
+                {recentHistory.slice(0, 3).map((item, index) => (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    className="w-full justify-start px-3 py-2 h-auto text-sm text-text-muted hover:text-text-primary hover:bg-glass rounded-lg"
+                  >
+                    <span className="truncate">{item.title || 'Untitled enhancement'}</span>
+                  </Button>
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
-        
-        <button
-          onClick={onToggle}
-          className="
-            p-2 rounded-lg text-text-muted hover:text-text-primary 
-            hover:bg-glass transition-all duration-150
-            premium-focus
-          "
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={`${collapsed ? 'Expand' : 'Collapse'} sidebar (⌘B)`}
-        >
-          <motion.div
-            animate={{ rotate: collapsed ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </motion.div>
-        </button>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-1">
-        {navigationItems.map((item, index) => {
-          const Icon = item.icon
-          const isActive = activeItem === item.id
-          const isHovered = hoveredItem === item.id
+        {/* Secondary Actions */}
+        <div className="p-3 border-t border-glass-border">
+          {secondaryItems.map((item) => {
+            const Icon = item.icon
+            const isHovered = hoveredItem === item.id
 
-          return (
-            <motion.button
-              key={item.id}
-              onClick={() => onItemSelect(item.id)}
-              onMouseEnter={() => setHoveredItem(item.id)}
-              onMouseLeave={() => setHoveredItem(null)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`
-                relative w-full flex items-center rounded-lg p-3 text-sm font-medium
-                transition-all duration-150 premium-focus
-                ${collapsed ? 'justify-center' : 'justify-start space-x-3'}
-                ${isActive 
-                  ? 'text-text-primary bg-glass-border' 
-                  : 'text-text-muted hover:text-text-primary hover:bg-glass'
-                }
-              `}
-              style={{ 
-                '--stagger-index': index 
-              } as React.CSSProperties}
-            >
-              {/* Active indicator */}
-              {isActive && (
-                <motion.div
-                  layoutId="activeIndicator"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-gold rounded-r-full"
-                  initial={false}
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-
-              {/* Icon with glow effect */}
-              <div className="relative">
-                <Icon className="w-4 h-4 relative z-10" />
-                {(isActive || isHovered) && (
+            return collapsed ? (
+              <Tooltip key={item.id}>
+                <TooltipTrigger asChild>
                   <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 0.3 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    className="absolute inset-0 bg-brand-gold rounded-full blur-sm"
-                  />
-                )}
-              </div>
-
-              {/* Label */}
-              <AnimatePresence mode="wait">
-                {!collapsed && (
-                  <motion.span
-                    variants={contentVariants}
-                    initial="collapsed"
-                    animate="expanded"
-                    exit="collapsed"
-                    className="relative z-10"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {item.label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-
-              {/* Tooltip for collapsed state */}
-              {collapsed && (
-                <AnimatePresence>
-                  {isHovered && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 10, scale: 0.9 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      exit={{ opacity: 0, x: 10, scale: 0.9 }}
-                      className="
-                        absolute left-full ml-3 top-1/2 -translate-y-1/2
-                        glass-panel px-3 py-2 rounded-lg shadow-lg z-50
-                        whitespace-nowrap
-                      "
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onItemSelect(item.id)}
+                      onMouseEnter={() => setHoveredItem(item.id)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      className="relative w-full h-12 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10"
                     >
-                      <div className="text-text-primary text-sm font-medium">
-                        {item.label}
-                      </div>
-                      <div className="text-text-muted text-xs">
-                        {item.description}
-                      </div>
-                      {/* Arrow */}
-                      <div className="
-                        absolute right-full top-1/2 -translate-y-1/2
-                        border-4 border-transparent border-r-[var(--panel)]
-                      " />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
-            </motion.button>
-          )
-        })}
-      </nav>
-
-      {/* Recent History - Only show when expanded */}
-      <AnimatePresence>
-        {!collapsed && recentHistory.length > 0 && (
-          <motion.div
-            variants={contentVariants}
-            initial="collapsed"
-            animate="expanded"
-            exit="collapsed"
-            className="p-3 border-t border-glass-border"
-          >
-            <div className="text-xs font-medium text-text-muted mb-2 px-3">
-              Recent
-            </div>
-            <div className="space-y-1">
-              {recentHistory.slice(0, 3).map((item, index) => (
-                <button
-                  key={index}
-                  className="
-                    w-full text-left px-3 py-2 text-sm text-text-muted 
-                    hover:text-text-primary hover:bg-glass rounded-lg 
-                    transition-all truncate
-                  "
+                      <Icon className="w-4 h-4" />
+                    </Button>
+                  </motion.div>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <div className="text-sm font-medium">{item.label}</div>
+                  <div className="text-xs text-muted-foreground">{item.description}</div>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <motion.div
+                key={item.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  variant="ghost"
+                  onClick={() => onItemSelect(item.id)}
+                  onMouseEnter={() => setHoveredItem(item.id)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  className="relative w-full justify-start space-x-3 h-12 rounded-lg px-3 text-text-muted hover:text-red-400 hover:bg-red-500/10"
                 >
-                  {item.title || 'Untitled enhancement'}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Secondary Actions */}
-      <div className="p-3 border-t border-glass-border">
-        {secondaryItems.map((item) => {
-          const Icon = item.icon
-          const isHovered = hoveredItem === item.id
-
-          return (
-            <motion.button
-              key={item.id}
-              onClick={() => onItemSelect(item.id)}
-              onMouseEnter={() => setHoveredItem(item.id)}
-              onMouseLeave={() => setHoveredItem(null)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`
-                relative w-full flex items-center rounded-lg p-3 text-sm font-medium
-                transition-all duration-150 premium-focus
-                text-text-muted hover:text-red-400 hover:bg-red-500/10
-                ${collapsed ? 'justify-center' : 'justify-start space-x-3'}
-              `}
-            >
-              <Icon className="w-4 h-4" />
-              
-              <AnimatePresence mode="wait">
-                {!collapsed && (
-                  <motion.span
-                    variants={contentVariants}
-                    initial="collapsed"
-                    animate="expanded"
-                    exit="collapsed"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-
-              {/* Tooltip for collapsed state */}
-              {collapsed && (
-                <AnimatePresence>
-                  {isHovered && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 10, scale: 0.9 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      exit={{ opacity: 0, x: 10, scale: 0.9 }}
-                      className="
-                        absolute left-full ml-3 top-1/2 -translate-y-1/2
-                        glass-panel px-3 py-2 rounded-lg shadow-lg z-50
-                        whitespace-nowrap
-                      "
+                  <Icon className="w-4 h-4" />
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      variants={contentVariants}
+                      initial="collapsed"
+                      animate="expanded"
+                      exit="collapsed"
                     >
-                      <div className="text-text-primary text-sm font-medium">
-                        {item.label}
-                      </div>
-                      <div className="text-text-muted text-xs">
-                        {item.description}
-                      </div>
-                      {/* Arrow */}
-                      <div className="
-                        absolute right-full top-1/2 -translate-y-1/2
-                        border-4 border-transparent border-r-[var(--panel)]
-                      " />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
-            </motion.button>
-          )
-        })}
-      </div>
-    </motion.div>
+                      {item.label}
+                    </motion.span>
+                  </AnimatePresence>
+                </Button>
+              </motion.div>
+            )
+          })}
+        </div>
+      </motion.div>
+    </TooltipProvider>
   )
 }

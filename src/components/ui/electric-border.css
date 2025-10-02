@@ -1,0 +1,126 @@
+/* Electric Border Animations */
+
+@keyframes electricFlow {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    filter: hue-rotate(0deg);
+  }
+  25% { 
+    background-position: 100% 50%; 
+    filter: hue-rotate(90deg);
+  }
+  50% { 
+    background-position: 200% 50%; 
+    filter: hue-rotate(180deg);
+  }
+  75% { 
+    background-position: 100% 50%; 
+    filter: hue-rotate(270deg);
+  }
+}
+
+@keyframes electricGlow {
+  0% { 
+    background-position: -200% 0; 
+    opacity: 0.3;
+  }
+  50% { 
+    background-position: 0% 0; 
+    opacity: 0.8;
+  }
+  100% { 
+    background-position: 200% 0; 
+    opacity: 0.3;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0.2; 
+    transform: scale(0.5) rotate(0deg);
+    filter: brightness(0.8);
+  }
+  25% { 
+    opacity: 0.6; 
+    transform: scale(0.8) rotate(90deg);
+    filter: brightness(1.2);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2) rotate(180deg);
+    filter: brightness(1.5);
+  }
+  75% { 
+    opacity: 0.8; 
+    transform: scale(1) rotate(270deg);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes electricPulse {
+  0%, 100% { 
+    box-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      inset 0 0 5px currentColor;
+  }
+  50% { 
+    box-shadow: 
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor,
+      inset 0 0 10px currentColor;
+  }
+}
+
+/* Electric particle trail effect */
+@keyframes particleTrail {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+    offset-distance: 0%;
+  }
+  5% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  95% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+    offset-distance: 100%;
+  }
+}
+
+/* Electric border path animation */
+@keyframes borderPath {
+  0% { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+
+/* Responsive electric effects */
+@media (max-width: 768px) {
+  .electric-border-container {
+    animation-duration: 4s !important;
+  }
+  
+  .electric-particle {
+    width: 1px !important;
+    height: 1px !important;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .electric-border-container,
+  .electric-border-container *,
+  .electric-particle {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

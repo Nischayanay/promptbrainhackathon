@@ -7,8 +7,12 @@ import {
   Mic, 
   Paperclip, 
   Zap,
-  Command
+  Command,
+  Cloud,
+  CloudOff,
+  AlertCircle
 } from 'lucide-react'
+import { draftPersistence, type DraftSyncStatus } from '../../lib/draftPersistence'
 
 type Mode = 'ideate' | 'flow'
 
@@ -60,6 +64,8 @@ export function PromptConsole({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [isFocused, setIsFocused] = useState(false)
   const [charCount, setCharCount] = useState(0)
+  const [syncStatus, setSyncStatus] = useState<DraftSyncStatus>({ status: 'idle' })
+  const [isInitialized, setIsInitialized] = useState(false)
   const maxChars = 2000
 
   const currentModeConfig = modeConfig[activeMode]
@@ -74,10 +80,67 @@ export function PromptConsole({
     }
   }
 
+  // Initialize draft persistence and load saved draft
+  useEffect(() => {
+    let mounted = true
+    
+    const initializeDraft = async () => {
+      try {
+        const savedDraft = await draftPersistence.loadDraft()
+        if (mounted && savedDraft && !input) {
+          setInput(savedDraft.content)
+          if (savedDraft.mode !== activeMode) {
+            onModeChange(savedDraft.mode)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to initialize draft:', error)
+      } finally {
+        if (mounted) {
+          setIsInitialized(true)
+        }
+      }
+    }
+
+    initializeDraft()
+
+    // Subscribe to sync status updates
+    const unsubscribe = draftPersistence.onSyncStatusChange(setSyncStatus)
+
+    return () => {
+      mounted = false
+      unsubscribe()
+    }
+  }, []) // Only run once on mount
+
+  // Auto-resize and update char count
   useEffect(() => {
     autoResize()
     setCharCount(input.length)
   }, [input])
+
+  // Save draft when input or mode changes (after initialization)
+  useEffect(() => {
+    if (!isInitialized) return
+
+    const draftData = {
+      content: input,
+      mode: activeMode,
+      metadata: {
+        timestamp: Date.now(),
+        charCount: input.length
+      }
+    }
+
+    draftPersistence.saveDraft(draftData)
+  }, [input, activeMode, isInitialized])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      draftPersistence.cleanup()
+    }
+  }, [])
 
   // Keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -159,17 +222,41 @@ export function PromptConsole({
             })}
           </div>
           
-          {/* Character Count */}
-          <div className={`
-            text-xs transition-colors duration-200
-            ${charCount > maxChars * 0.9 
-              ? 'text-red-400' 
-              : charCount > maxChars * 0.7 
-                ? 'text-yellow-400' 
-                : 'text-text-muted'
-            }
-          `}>
-            {charCount}/{maxChars}
+          {/* Character Count and Sync Status */}
+          <div className="flex items-center space-x-3">
+            {/* Sync Status Indicator */}
+            <div className="flex items-center space-x-1">
+              {syncStatus.status === 'syncing' && (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <Cloud className="w-3 h-3 text-text-muted" />
+                </motion.div>
+              )}
+              {syncStatus.status === 'synced' && (
+                <Cloud className="w-3 h-3 text-green-400" />
+              )}
+              {syncStatus.status === 'error' && (
+                <div className="flex items-center space-x-1" title={syncStatus.error}>
+                  <CloudOff className="w-3 h-3 text-red-400" />
+                  <AlertCircle className="w-3 h-3 text-red-400" />
+                </div>
+              )}
+            </div>
+
+            {/* Character Count */}
+            <div className={`
+              text-xs transition-colors duration-200
+              ${charCount > maxChars * 0.9 
+                ? 'text-red-400' 
+                : charCount > maxChars * 0.7 
+                  ? 'text-yellow-400' 
+                  : 'text-text-muted'
+              }
+            `}>
+              {charCount}/{maxChars}
+            </div>
           </div>
         </div>
 
