@@ -9,7 +9,7 @@ import { FlowContextChips, FlowQuestionCard } from "./Prompt/FlowQuestionCard";
 import { ChatThread, type ChatMessage as ChatThreadMessage } from "./Chat/ChatThread";
 import { useFlowMode } from "../hooks/useFlowMode";
 import { designTokens } from "../lib/designTokens";
-import { sessionManagement, type SessionSyncStatus } from "../lib/sessionManagement";
+import { sessionManagement } from "../lib/sessionManagement";
 
 type Mode = "ideate" | "flow";
 
@@ -36,7 +36,6 @@ export function Dashboard2ProRedesigned() {
   // Layout state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [activeNavItem, setActiveNavItem] = useState("enhance");
-  const [sessionSyncStatus, setSessionSyncStatus] = useState<SessionSyncStatus>({ status: 'idle' });
   const [isSessionInitialized, setIsSessionInitialized] = useState(false);
 
   // Credits system (server-authoritative)
@@ -73,12 +72,8 @@ export function Dashboard2ProRedesigned() {
 
     initializeSession()
 
-    // Subscribe to session sync status updates
-    const unsubscribe = sessionManagement.onSyncStatusChange(setSessionSyncStatus)
-
     return () => {
       mounted = false
-      unsubscribe()
     }
   }, []) // Only run once on mount
 
@@ -166,7 +161,7 @@ export function Dashboard2ProRedesigned() {
       const structuredPrompt = getStructuredPrompt();
       setInput(structuredPrompt);
       setActiveMode("ideate");
-      await enhancePrompt("enhance");
+      await enhancePrompt();
     } else {
       nextStep();
     }
@@ -185,7 +180,7 @@ export function Dashboard2ProRedesigned() {
   };
 
   // Direct Backend Brain Integration
-  const enhancePrompt = async (effectType = "enhance") => {
+  const enhancePrompt = async () => {
     if (!input.trim() || isEnhancing || !canSpend) return;
 
     setIsEnhancing(true);
@@ -302,28 +297,16 @@ export function Dashboard2ProRedesigned() {
 
       // Rollback credits and show error
       await earn(1, "enhancement_failed_rollback");
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       setAnnouncement(
-        `❌ Backend Brain enhancement failed: ${error.message}. Credits refunded.`,
+        `❌ Backend Brain enhancement failed: ${errorMessage}. Credits refunded.`,
       );
     } finally {
       setIsEnhancing(false);
     }
   };
 
-  // Generate mock enhanced output
-  const generateEnhancedOutput = (
-    input: string,
-    mode: Mode,
-    effectType: string,
-  ): string => {
-    const effects = {
-      enhance: mode === "ideate"
-        ? `✨ Enhanced Creative Prompt:\n\n"${input}"\n\n🎯 Key Improvements:\n• Added specific context and constraints\n• Clarified desired output format\n• Enhanced with creative direction\n• Optimized for AI understanding\n\nThis refined prompt will generate more focused and creative results.`
-        : `🌊 Structured Workflow for: "${input}"\n\n📋 Step-by-step Process:\n\n1. **Analysis Phase**\n   - Break down core requirements\n   - Identify key stakeholders\n\n2. **Planning Phase**\n   - Define success metrics\n   - Create timeline\n\n3. **Execution Phase**\n   - Implement solution\n   - Monitor progress\n\n4. **Review Phase**\n   - Evaluate results\n   - Iterate improvements`,
-    };
 
-    return effects[effectType as keyof typeof effects] || effects.enhance;
-  };
 
   // Handle insufficient credits
   const handleAddCredits = async () => {
@@ -356,7 +339,7 @@ export function Dashboard2ProRedesigned() {
     }
   };
 
-  const handleRateMessage = (messageId: string, rating: 'up' | 'down') => {
+  const handleRateMessage = (_messageId: string, rating: 'up' | 'down') => {
     // TODO: Implement rating system
     setAnnouncement(`Message rated ${rating === 'up' ? 'positively' : 'negatively'}`);
   };
