@@ -91,6 +91,11 @@ export function Dashboard2ProRedesigned() {
     } catch {}
   }, []);
 
+  // Debug: Log chatMessages changes
+  useEffect(() => {
+    console.log("💬 chatMessages updated:", chatMessages.length, chatMessages);
+  }, [chatMessages]);
+
   useEffect(() => {
     try {
       localStorage.setItem(HISTORY_KEY, JSON.stringify(chatHistory));
@@ -184,14 +189,38 @@ export function Dashboard2ProRedesigned() {
 
   // Direct Backend Brain Integration
   const enhancePrompt = async () => {
-    if (!input.trim() || isEnhancing || !canSpend) return;
+    console.log("🚀 enhancePrompt called", { 
+      hasInput: !!input.trim(), 
+      isEnhancing, 
+      canSpend, 
+      credits 
+    });
+
+    if (!input.trim()) {
+      console.log("❌ No input provided");
+      return;
+    }
+    
+    if (isEnhancing) {
+      console.log("❌ Already enhancing");
+      return;
+    }
+    
+    if (!canSpend) {
+      console.log("❌ Cannot spend credits", { credits, canSpend, creditsLoading });
+      setAnnouncement(`⚠️ Insufficient credits. You have ${credits} credits. You need at least 1 credit to enhance.`);
+      return;
+    }
 
     setIsEnhancing(true);
     setAnnouncement("🧠 Backend Brain is analyzing your prompt...");
 
     const promptId = crypto.randomUUID();
 
+    console.log("💳 Attempting to spend 1 credit...");
     const spent = await spend(1, "prompt_enhancement", promptId);
+    console.log("💳 Spend result:", spent);
+    
     if (!spent) {
       setIsEnhancing(false);
       setAnnouncement("Insufficient credits to enhance prompt");
@@ -298,7 +327,12 @@ export function Dashboard2ProRedesigned() {
       };
 
       // Update both chat systems
-      setChatMessages((prev) => [...prev, userMessage, assistantMessage]);
+      console.log("💬 Adding messages to chat:", { userMessage, assistantMessage });
+      setChatMessages((prev) => {
+        const newMessages = [...prev, userMessage, assistantMessage];
+        console.log("💬 Updated chatMessages:", newMessages);
+        return newMessages;
+      });
       setChatHistory((prev) => [legacyMessage, ...prev]);
       setInput("");
       setAnnouncement(
@@ -571,7 +605,7 @@ export function Dashboard2ProRedesigned() {
         </AnimatePresence>
 
         {/* Chat Thread */}
-        {chatMessages.length > 0 && (
+        {chatMessages.length > 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -585,7 +619,7 @@ export function Dashboard2ProRedesigned() {
               onRateMessage={handleRateMessage}
             />
           </motion.div>
-        )}
+        ) : null}
       </AppShell>
     </div>
   );
