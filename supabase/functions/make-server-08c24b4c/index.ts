@@ -1,23 +1,34 @@
-import { Hono } from "npm:hono";
-import { cors } from "npm:hono/cors";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const app = new Hono();
+serve(async (req) => {
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+      },
+    });
+  }
 
-app.use('*', cors({
-  origin: '*',
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
-}));
+  if (req.method !== 'POST') {
+    return new Response(
+      JSON.stringify({ success: false, error: 'Only POST method allowed' }),
+      { 
+        status: 405, 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        } 
+      }
+    );
+  }
 
-// Simple test endpoint
-app.get("/test", (c) => {
-  return c.json({ message: "Function is working!", timestamp: new Date().toISOString() });
-});
-
-// Enhanced prompt endpoint - simplified version
-app.post("/make-server-08c24b4c/enhance-prompt", async (c) => {
+  // Enhanced prompt endpoint
+  const enhancePrompt = async () => {
   try {
-    const body = await c.req.json();
+    const body = await req.json();
     const { mode, originalPrompt, flowData } = body;
 
     console.log(`Received request: mode=${mode}, prompt="${originalPrompt}"`);
@@ -28,10 +39,16 @@ app.post("/make-server-08c24b4c/enhance-prompt", async (c) => {
     
     if (!geminiApiKey) {
       console.log("No Gemini API key found");
-      return c.json({ 
-        success: false, 
-        error: "No Gemini API key configured" 
-      }, 500);
+      return new Response(
+        JSON.stringify({ success: false, error: "No Gemini API key configured" }),
+        { 
+          status: 500, 
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          } 
+        }
+      );
     }
     
     // Enhanced prompt with rulebook system
@@ -87,7 +104,7 @@ Make the enhanced prompt significantly more detailed, specific, and actionable t
 
     console.log(`Making Gemini API call...`);
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -112,10 +129,16 @@ Make the enhanced prompt significantly more detailed, specific, and actionable t
     if (!response.ok) {
       const errorText = await response.text();
       console.log(`Gemini API error: ${errorText}`);
-      return c.json({ 
-        success: false, 
-        error: `Gemini API error: ${response.status}` 
-      }, 500);
+      return new Response(
+        JSON.stringify({ success: false, error: `Gemini API error: ${response.status}` }),
+        { 
+          status: 500, 
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          } 
+        }
+      );
     }
     
     const data = await response.json();
@@ -123,40 +146,62 @@ Make the enhanced prompt significantly more detailed, specific, and actionable t
     
     if (!enhancedText) {
       console.log("No enhanced text in response");
-      return c.json({ 
-        success: false, 
-        error: "No enhanced text generated" 
-      }, 500);
+      return new Response(
+        JSON.stringify({ success: false, error: "No enhanced text generated" }),
+        { 
+          status: 500, 
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          } 
+        }
+      );
     }
     
     console.log(`Successfully enhanced prompt: ${enhancedText.substring(0, 100)}...`);
 
-    return c.json({
-      success: true,
-      enhancedPrompt: {
-        english: enhancedText,
-        detailed: enhancedText,
-        short: enhancedText.substring(0, 200) + "..."
-      },
-      jsonFormat: JSON.stringify({
-        role: "Professional Prompt Enhancer",
-        task: `Enhance: ${originalPrompt}`,
-        audience: "AI systems and users",
-        framework: "Structured prompt enhancement",
-        format: "Detailed, actionable instruction",
-        constraints: "Maintain original intent while adding specificity",
-        example: enhancedText.substring(0, 150) + "..."
-      }, null, 2),
-      mode: mode || 'direct'
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        enhancedPrompt: {
+          english: enhancedText,
+          detailed: enhancedText,
+          short: enhancedText.substring(0, 200) + "..."
+        },
+        jsonFormat: JSON.stringify({
+          role: "Professional Prompt Enhancer",
+          task: `Enhance: ${originalPrompt}`,
+          audience: "AI systems and users",
+          framework: "Structured prompt enhancement",
+          format: "Detailed, actionable instruction",
+          constraints: "Maintain original intent while adding specificity",
+          example: enhancedText.substring(0, 150) + "..."
+        }, null, 2),
+        mode: mode || 'direct'
+      }),
+      { 
+        status: 200, 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        } 
+      }
+    );
     
   } catch (error) {
     console.log(`Enhancement error: ${error.message}`);
-    return c.json({ 
-      success: false, 
-      error: error.message 
-    }, 500);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { 
+        status: 500, 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        } 
+      }
+    );
   }
-});
+  };
 
-export default app;
+  return await enhancePrompt();
+});

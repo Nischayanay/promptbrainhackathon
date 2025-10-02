@@ -18,22 +18,22 @@ app.get("/test", (c) => {
 app.post("/enhance-prompt", async (c) => {
   try {
     const body = await c.req.json();
-    const { mode, originalPrompt, flowData } = body;
-    
+    const { mode, originalPrompt } = body;
+
     console.log(`Received request: mode=${mode}, prompt="${originalPrompt}"`);
-    
+
     // Get Gemini API key
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
     console.log(`Gemini API key found: ${geminiApiKey ? 'YES' : 'NO'}`);
-    
+
     if (!geminiApiKey) {
       console.log("No Gemini API key found");
-      return c.json({ 
-        success: false, 
-        error: "No Gemini API key configured" 
+      return c.json({
+        success: false,
+        error: "No Gemini API key configured"
       }, 500);
     }
-    
+
     // Simple prompt for testing
     const testPrompt = `You are a professional prompt enhancer. Transform this basic prompt into a detailed, structured instruction that will help an AI generate better results.
 
@@ -49,7 +49,7 @@ Provide a detailed enhanced version that includes:
 Make the enhanced prompt 2-3x more detailed and specific than the original.`;
 
     console.log(`Making Gemini API call...`);
-    
+
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
@@ -69,31 +69,31 @@ Make the enhanced prompt 2-3x more detailed and specific than the original.`;
         }
       })
     });
-    
+
     console.log(`Gemini response status: ${response.status}`);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       console.log(`Gemini API error: ${errorText}`);
-      return c.json({ 
-        success: false, 
-        error: `Gemini API error: ${response.status}` 
+      return c.json({
+        success: false,
+        error: `Gemini API error: ${response.status}`
       }, 500);
     }
-    
+
     const data = await response.json();
     const enhancedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
+
     if (!enhancedText) {
       console.log("No enhanced text in response");
-      return c.json({ 
-        success: false, 
-        error: "No enhanced text generated" 
+      return c.json({
+        success: false,
+        error: "No enhanced text generated"
       }, 500);
     }
-    
+
     console.log(`Successfully enhanced prompt: ${enhancedText.substring(0, 100)}...`);
-    
+
     return c.json({
       success: true,
       enhancedPrompt: {
@@ -112,12 +112,13 @@ Make the enhanced prompt 2-3x more detailed and specific than the original.`;
       }, null, 2),
       mode: mode || 'direct'
     });
-    
+
   } catch (error) {
-    console.log(`Enhancement error: ${error.message}`);
-    return c.json({ 
-      success: false, 
-      error: error.message 
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.log(`Enhancement error: ${errorMessage}`);
+    return c.json({
+      success: false,
+      error: errorMessage
     }, 500);
   }
 });

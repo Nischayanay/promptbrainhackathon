@@ -6,7 +6,10 @@ import { FloatingCreditsOrb } from "./Layout/FloatingCreditsOrb";
 import { useCredits } from "../lib/credits";
 import { PromptConsole } from "./Prompt/PromptConsole";
 import { FlowContextChips, FlowQuestionCard } from "./Prompt/FlowQuestionCard";
-import { ChatThread, type ChatMessage as ChatThreadMessage } from "./Chat/ChatThread";
+import {
+  type ChatMessage as ChatThreadMessage,
+  ChatThread,
+} from "./Chat/ChatThread";
 import { useFlowMode } from "../hooks/useFlowMode";
 import { designTokens } from "../lib/designTokens";
 import { sessionManagement } from "../lib/sessionManagement";
@@ -51,31 +54,31 @@ export function Dashboard2ProRedesigned() {
 
   // Initialize session management and restore state
   useEffect(() => {
-    let mounted = true
-    
+    let mounted = true;
+
     const initializeSession = async () => {
       try {
-        const savedSession = await sessionManagement.loadSession()
+        const savedSession = await sessionManagement.loadSession();
         if (mounted && savedSession) {
-          setActiveMode(savedSession.last_mode)
-          setSidebarCollapsed(savedSession.sidebar_collapsed)
+          setActiveMode(savedSession.last_mode);
+          setSidebarCollapsed(savedSession.sidebar_collapsed);
           // Apply any other preferences here
         }
       } catch (error) {
-        console.error('Failed to initialize session:', error)
+        console.error("Failed to initialize session:", error);
       } finally {
         if (mounted) {
-          setIsSessionInitialized(true)
+          setIsSessionInitialized(true);
         }
       }
-    }
+    };
 
-    initializeSession()
+    initializeSession();
 
     return () => {
-      mounted = false
-    }
-  }, []) // Only run once on mount
+      mounted = false;
+    };
+  }, []); // Only run once on mount
 
   // Restore and persist chat history
   useEffect(() => {
@@ -96,26 +99,26 @@ export function Dashboard2ProRedesigned() {
 
   // Save session state when it changes (after initialization)
   useEffect(() => {
-    if (!isSessionInitialized) return
+    if (!isSessionInitialized) return;
 
     const sessionState = {
       last_mode: activeMode,
       sidebar_collapsed: sidebarCollapsed,
       preferences: {
         // Add any other preferences here
-        active_nav_item: activeNavItem
-      }
-    }
+        active_nav_item: activeNavItem,
+      },
+    };
 
-    sessionManagement.saveSession(sessionState)
-  }, [activeMode, sidebarCollapsed, activeNavItem, isSessionInitialized])
+    sessionManagement.saveSession(sessionState);
+  }, [activeMode, sidebarCollapsed, activeNavItem, isSessionInitialized]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      sessionManagement.cleanup()
-    }
-  }, [])
+      sessionManagement.cleanup();
+    };
+  }, []);
 
   // Flow mode
   const {
@@ -196,44 +199,53 @@ export function Dashboard2ProRedesigned() {
     }
 
     try {
+      // DEBUG: Log the request details
+      const requestBody = {
+        mode: activeMode,
+        originalPrompt: input.trim(),
+        flowData: null,
+      };
+      console.log("🔍 DEBUG: Sending request to enhance-prompt");
+      console.log("📦 Request body:", requestBody);
+      
       // Call the make-server function with correct parameters
-      const response = await fetch(
-        "https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${
-              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwMDc3OSwiZXhwIjoyMDY1NDc2Nzc5fQ.mthkPFNO0QfH02TiHoA5lHbBZ02fUX2YZQGkMS4kGpc"
-            }`,
-            "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY ||
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDA3NzksImV4cCI6MjA2NTQ3Njc3OX0.Hs_rJaWcELKEBYjRQKKmLfJCcgqGJhFJvJQGJhFJvJQ",
-          },
-          body: JSON.stringify({
-            mode: activeMode,
-            originalPrompt: input.trim(),
-            flowData: null,
-          }),
+      const apiUrl = "https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt";
+      console.log("🌐 API URL:", apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${
+            import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwMDc3OSwiZXhwIjoyMDY1NDc2Nzc5fQ.mthkPFNO0QfH02TiHoA5lHbBZ02fUX2YZQGkMS4kGpc"
+          }`,
+          "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY ||
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDA3NzksImV4cCI6MjA2NTQ3Njc3OX0.Hs_rJaWcELKEBYjRQKKmLfJCcgqGJhFJvJQGJhFJvJQ",
         },
-      );
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log("📡 Response status:", response.status);
+      console.log("📡 Response headers:", Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("API Error Response:", errorText);
+        console.error("❌ API Error Response:", errorText);
         throw new Error(`API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log("API Response:", data);
+      console.log("✅ API Response:", data);
 
       if (!data.success) {
         throw new Error(data.error || "Enhancement failed");
       }
 
       // Extract the enhanced text from the response
-      const enhancedText = data.enhancedPrompt?.detailed || data.enhancedPrompt?.english || "";
-      
+      const enhancedText = data.enhancedPrompt?.detailed ||
+        data.enhancedPrompt?.english || "";
+
       if (!enhancedText) {
         throw new Error("No enhanced text in response");
       }
@@ -244,12 +256,13 @@ export function Dashboard2ProRedesigned() {
       const enhancementRatio = enhancedLength / originalLength;
       const qualityScore = Math.min(0.95, 0.7 + (enhancementRatio * 0.1));
       const processingTime = 1500; // Mock processing time in ms
-      const whySummary = "Enhanced with structured framework, added context, and improved clarity for better AI understanding.";
+      const whySummary =
+        "Enhanced with structured framework, added context, and improved clarity for better AI understanding.";
 
       // Create user message
       const userMessage: ChatThreadMessage = {
         id: `${promptId}-user`,
-        type: 'user',
+        type: "user",
         content: input.trim(),
         timestamp: new Date().toISOString(),
         mode: activeMode,
@@ -258,15 +271,18 @@ export function Dashboard2ProRedesigned() {
       // Create assistant message
       const assistantMessage: ChatThreadMessage = {
         id: promptId,
-        type: 'assistant',
-        content: `🧠 **Backend Brain Enhanced Prompt**\n\n${enhancedText}\n\n---\n\n💡 **Why This Enhancement Works:**\n${whySummary}`,
+        type: "assistant",
+        content:
+          `🧠 **Backend Brain Enhanced Prompt**\n\n${enhancedText}\n\n---\n\n💡 **Why This Enhancement Works:**\n${whySummary}`,
         timestamp: new Date().toISOString(),
         mode: activeMode,
         metadata: {
           quality_score: qualityScore,
           enhancement_ratio: enhancementRatio,
           processing_time: processingTime,
-          title: `🧠 Backend Brain Enhanced • ${(qualityScore * 100).toFixed(0)}% Quality • ${enhancementRatio.toFixed(1)}x Enhancement`,
+          title: `🧠 Backend Brain Enhanced • ${
+            (qualityScore * 100).toFixed(0)
+          }% Quality • ${enhancementRatio.toFixed(1)}x Enhancement`,
         },
       };
 
@@ -277,7 +293,7 @@ export function Dashboard2ProRedesigned() {
         timestamp: new Date().toISOString(),
         input: input.trim(),
         output: assistantMessage.content,
-        title: assistantMessage.metadata?.title || '',
+        title: assistantMessage.metadata?.title || "",
         effectType: "backend-brain",
       };
 
@@ -297,7 +313,9 @@ export function Dashboard2ProRedesigned() {
 
       // Rollback credits and show error
       await earn(1, "enhancement_failed_rollback");
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "Unknown error occurred";
       setAnnouncement(
         `❌ Backend Brain enhancement failed: ${errorMessage}. Credits refunded.`,
       );
@@ -305,8 +323,6 @@ export function Dashboard2ProRedesigned() {
       setIsEnhancing(false);
     }
   };
-
-
 
   // Handle insufficient credits
   const handleAddCredits = async () => {
@@ -317,21 +333,24 @@ export function Dashboard2ProRedesigned() {
   };
 
   // Handle chat message actions
-  const handleMessageAction = (messageId: string, action: 'copy' | 'reuse' | 'regenerate' | 'rate') => {
-    const message = chatMessages.find(m => m.id === messageId);
+  const handleMessageAction = (
+    messageId: string,
+    action: "copy" | "reuse" | "regenerate" | "rate",
+  ) => {
+    const message = chatMessages.find((m) => m.id === messageId);
     if (!message) return;
 
     switch (action) {
-      case 'copy':
+      case "copy":
         navigator.clipboard.writeText(message.content);
-        setAnnouncement('Message copied to clipboard');
+        setAnnouncement("Message copied to clipboard");
         break;
-      case 'reuse':
+      case "reuse":
         setInput(message.content);
-        setAnnouncement('Message loaded as new input');
+        setAnnouncement("Message loaded as new input");
         break;
-      case 'regenerate':
-        if (message.type === 'user') {
+      case "regenerate":
+        if (message.type === "user") {
           setInput(message.content);
           enhancePrompt();
         }
@@ -339,9 +358,11 @@ export function Dashboard2ProRedesigned() {
     }
   };
 
-  const handleRateMessage = (_messageId: string, rating: 'up' | 'down') => {
+  const handleRateMessage = (_messageId: string, rating: "up" | "down") => {
     // TODO: Implement rating system
-    setAnnouncement(`Message rated ${rating === 'up' ? 'positively' : 'negatively'}`);
+    setAnnouncement(
+      `Message rated ${rating === "up" ? "positively" : "negatively"}`,
+    );
   };
 
   // Navigation handlers
