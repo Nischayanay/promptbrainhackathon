@@ -209,10 +209,10 @@ export function Dashboard2ProRedesigned() {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${
-              (import.meta as any).env?.VITE_SUPABASE_SERVICE_ROLE_KEY ||
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
               "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwMDc3OSwiZXhwIjoyMDY1NDc2Nzc5fQ.mthkPFNO0QfH02TiHoA5lHbBZ02fUX2YZQGkMS4kGpc"
             }`,
-            "apikey": (import.meta as any).env?.VITE_SUPABASE_ANON_KEY ||
+            "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY ||
               "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDA3NzksImV4cCI6MjA2NTQ3Njc3OX0.Hs_rJaWcELKEBYjRQKKmLfJCcgqGJhFJvJQGJhFJvJQ",
           },
           body: JSON.stringify({
