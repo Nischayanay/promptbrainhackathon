@@ -213,7 +213,7 @@ export function Dashboard2Pro() {
       const { data: { session } } = await supabase.auth.getSession();
       const authHeader = session?.access_token
         ? `Bearer ${session.access_token}`
-        : `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`;
+        : `Bearer ${(import.meta as any).env.VITE_SUPABASE_ANON_KEY}`;
 
       const res = await fetch(
         "https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt",
@@ -1350,9 +1350,10 @@ export function Dashboard2Pro() {
                     <div className="flex-1">
                       <motion.textarea
                         value={isFlowMode ? currentAnswer : input}
-                        onChange={(e) => isFlowMode
-                          ? setCurrentAnswer(e.target.value)
-                          : setInput(e.target.value)}
+                        onChange={(e) =>
+                          isFlowMode
+                            ? setCurrentAnswer(e.target.value)
+                            : setInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                             e.preventDefault();

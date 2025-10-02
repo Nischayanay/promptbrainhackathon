@@ -99,16 +99,23 @@ export function AppShellHero({
         <div className="mb-6 flex justify-center">
           <ElectricBorder 
             color="#00d4ff" 
-            intensity={1.2} 
+            intensity={1.5} 
             speed={1.5}
             className="inline-block"
           >
             <h1 className="
-              font-display text-4xl sm:text-5xl lg:text-6xl font-semibold 
-              text-text-primary tracking-tight
-              bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent
-              px-2 py-1
-            ">
+              font-display text-4xl sm:text-5xl lg:text-6xl font-bold 
+              tracking-tight
+              bg-gradient-to-r from-cyan-300 via-cyan-200 to-cyan-400
+              bg-clip-text text-transparent
+              px-6 py-3
+              drop-shadow-[0_0_30px_rgba(0,212,255,0.5)]
+            "
+            style={{
+              textShadow: '0 0 40px rgba(0, 212, 255, 0.8), 0 0 80px rgba(0, 212, 255, 0.4)',
+              WebkitTextStroke: '1px rgba(0, 212, 255, 0.3)'
+            }}
+            >
               {title}
             </h1>
           </ElectricBorder>
@@ -117,9 +124,14 @@ export function AppShellHero({
       
       {subtitle && (
         <p className="
-          font-body text-lg sm:text-xl text-text-muted 
+          font-body text-lg sm:text-xl
           max-w-2xl mx-auto leading-relaxed
-        ">
+          text-gray-300
+        "
+        style={{
+          color: 'rgba(209, 213, 219, 0.9)'
+        }}
+        >
           {subtitle}
         </p>
       )}
