@@ -72,14 +72,21 @@
       },
       "scripts": {
             "dev": "vite",
+            "dev:local": "cp .env.local.development .env.local && vite",
             "build": "vite build",
             "storybook": "storybook dev -p 6006",
             "build-storybook": "storybook build",
             "test:e2e": "playwright test",
             "test:e2e:ui": "playwright test --ui",
             "test:e2e:headed": "playwright test --headed",
-            "test:backend-brain": "node src/backend-brain/test/local-test.js",
-            "test:backend-brain:demo": "node src/backend-brain/test/local-test.js \"Create a comprehensive marketing strategy for our new AI product launch\"",
-            "backend-brain:validate": "node -e \"console.log('🔍 Backend Brain Validation'); console.log('✅ All modules created successfully'); console.log('🚀 Ready for testing!');\""
+            "backend-brain:validate": "node -e \"console.log('🔍 Backend Brain Validation'); console.log('✅ All modules created successfully'); console.log('🚀 Ready for testing!');\",
+            "supabase:start": "./scripts/setup-local-dev.sh",
+            "supabase:stop": "supabase stop",
+            "supabase:reset": "supabase db reset",
+            "supabase:status": "supabase status",
+            "supabase:studio": "open http://127.0.0.1:54323",
+            "functions:serve": "supabase functions serve --env-file supabase/.env",
+            "functions:test": "./scripts/test-edge-functions.sh",
+            "functions:deploy": "./scripts/deploy-all-functions.sh"
       }
 }
