@@ -1,7 +1,7 @@
 import React, { ErrorInfo, ReactNode, useEffect } from "react";
 
-// Import the user dashboard App component
-import UserDashboardApp from "../../user dashboard/src/App";
+// Import the current dashboard component
+import { Dashboard2ProRedesigned } from "../Dashboard2ProRedesigned";
 
 // Import dashboard styles
 import "../../styles/user-dashboard-integration.css";
@@ -101,7 +101,7 @@ export function UserDashboardPage() {
           This provides scoped styling and proper error boundaries
         */
         }
-        <UserDashboardApp />
+        <Dashboard2ProRedesigned />
 
         {
           /*
