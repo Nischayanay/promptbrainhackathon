@@ -1,0 +1,142 @@
+/* Theme-specific CSS organization for PromptBrain routing */
+
+/* Landing Page Theme */
+.landing-theme {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+  background: var(--color-landing-black);
+  color: var(--color-landing-white);
+}
+
+.landing-theme h1 {
+  font-family: Inter Tight, Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--color-landing-white);
+}
+
+.landing-theme h2 {
+  font-family: Inter Tight, Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-landing-white);
+}
+
+.landing-theme p {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-landing-white);
+}
+
+/* Auth Pages Theme (Temple) */
+.temple-theme {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+  background: var(--color-temple-black);
+  color: var(--color-marble-white);
+}
+
+.temple-theme h1 {
+  font-family: Playfair Display, serif;
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-royal-gold);
+}
+
+.temple-theme h2 {
+  font-family: Playfair Display, serif;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-marble-white);
+}
+
+.temple-theme .mystical-text {
+  color: var(--color-royal-gold);
+  font-family: Playfair Display, serif;
+}
+
+/* Dashboard Theme (Cinematic) */
+.cinematic-theme {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+  background: var(--color-cinematic-base);
+  color: var(--color-glass-white);
+}
+
+.cinematic-theme h1 {
+  font-family: Inter Tight, Inter, sans-serif;
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-glass-white);
+}
+
+.cinematic-theme h2 {
+  font-family: Inter Tight, Inter, sans-serif;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-glass-white);
+}
+
+.cinematic-theme h3 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neon-cyan);
+}
+
+.cinematic-theme .glow-text {
+  text-shadow: 0 0 20px rgba(0, 255, 231, 0.5);
+}
+
+/* Route-specific animations */
+.route-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.route-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.route-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.route-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+/* Focus states for accessibility */
+.landing-theme *:focus-visible,
+.temple-theme *:focus-visible,
+.cinematic-theme *:focus-visible {
+  outline: 2px solid var(--color-neon-cyan);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .landing-theme h1 {
+    font-size: 2.5rem;
+  }
+  
+  .landing-theme h2 {
+    font-size: 1.75rem;
+  }
+  
+  .temple-theme h1 {
+    font-size: var(--text-2xl);
+  }
+  
+  .cinematic-theme h1 {
+    font-size: var(--text-3xl);
+  }
+}

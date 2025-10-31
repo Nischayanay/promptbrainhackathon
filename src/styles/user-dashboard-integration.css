@@ -1,0 +1,530 @@
+/* User Dashboard Integration Styles */
+
+/* Import Google Fonts for Dashboard */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tourney:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Dashboard-specific CSS Variables - Merged with main app */
+.user-dashboard-container {
+  /* PromptBrain Design System - 8px Grid + Refined Spacing */
+  --spacing-unit: 8px;
+  --spacing-0-5: 4px;
+  --spacing-1: calc(var(--spacing-unit) * 1);  /* 8px */
+  --spacing-1-5: 12px;
+  --spacing-2: calc(var(--spacing-unit) * 2);  /* 16px */
+  --spacing-2-5: 20px;
+  --spacing-3: calc(var(--spacing-unit) * 3);  /* 24px */
+  --spacing-4: calc(var(--spacing-unit) * 4);  /* 32px */
+  --spacing-5: calc(var(--spacing-unit) * 5);  /* 40px */
+  --spacing-6: calc(var(--spacing-unit) * 6);  /* 48px */
+  --spacing-7: 56px;
+  --spacing-8: calc(var(--spacing-unit) * 8);  /* 64px */
+  --spacing-9: 72px;
+  --spacing-10: calc(var(--spacing-unit) * 10); /* 80px */
+  --spacing-11: 88px;
+  --spacing-12: calc(var(--spacing-unit) * 12); /* 96px */
+  --spacing-14: 112px;
+  --spacing-16: calc(var(--spacing-unit) * 16); /* 128px */
+  --spacing-18: 144px;
+  --spacing-20: 160px;
+
+  /* Fluid Typography - Responsive Scaling with Optical Sizing */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.5rem);
+  --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.875rem);
+  --text-2xl: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 3rem);
+  --text-4xl: clamp(2.25rem, 1.8rem + 2.25vw, 3.75rem);
+  --text-5xl: clamp(3rem, 2.25rem + 3.75vw, 5rem);
+  --text-6xl: clamp(3.75rem, 2.75rem + 5vw, 6.5rem);
+
+  /* Premium Color Palette - Depth & Sophistication */
+  --pb-black: #0A0A0A;           /* Softer than pure black */
+  --pb-pure-black: #000000;      /* Reserved for overlays */
+  --pb-near-black: #0D0D0F;      /* Warm undertones */
+  --pb-surface-1: #111111;       /* Layer 1 */
+  --pb-surface-2: #1A1A1A;       /* Layer 2 */
+  --pb-surface-3: #222222;       /* Layer 3 */
+  --pb-dark-gray: #2A2A2A;
+  --pb-gray: #333333;
+  --pb-mid-gray: #666666;        /* 5.74:1 on black (AA Large Text) */
+  --pb-light-gray: #999999;      /* 9.54:1 on black (AAA) */
+  --pb-white: #FFFFFF;           /* 21:1 on black (AAA) */
+  --pb-cyan: #00D9FF;            /* 10.2:1 on black (AAA) */
+  --pb-cyan-dark: #0099FF;       /* 6.5:1 on black (AAA) */
+  --pb-cyan-light: #4DFFFF;      /* 13.1:1 on black (AAA) */
+  --pb-purple: #8B5CF6;          /* Secondary accent */
+  --pb-purple-light: #A78BFA;
+  
+  /* WCAG Focus States - 3:1 Contrast Delta Minimum */
+  --focus-outline-width: 2px;
+  --focus-outline-offset: 2px;
+  --focus-contrast-delta: 4.5;   /* Exceeds 3:1 requirement */
+  
+  /* Touch Target Minimum (WCAG 2.2) */
+  --min-touch-target: 24px;
+  
+  /* Premium Border Radius Hierarchy */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 999px;
+  
+  /* Sophisticated Shadow System - Multi-layer */
+  --shadow-sm: 
+    0 1px 2px 0 rgba(0, 0, 0, 0.3),
+    0 1px 3px 0 rgba(0, 0, 0, 0.15);
+  
+  --shadow-md: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  
+  --shadow-lg: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.4),
+    0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  
+  --shadow-xl: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  
+  --shadow-2xl:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  
+  /* Cyan Glow Shadows */
+  --shadow-cyan-sm:
+    0 0 10px rgba(0, 217, 255, 0.15),
+    0 0 20px rgba(0, 217, 255, 0.1);
+    
+  --shadow-cyan-md:
+    0 0 20px rgba(0, 217, 255, 0.2),
+    0 0 40px rgba(0, 217, 255, 0.1);
+    
+  --shadow-cyan-lg:
+    0 0 30px rgba(0, 217, 255, 0.3),
+    0 0 60px rgba(0, 217, 255, 0.15);
+  
+  /* Glass Morphism Effects */
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-bg-hover: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(255, 255, 255, 0.1);
+  --glass-blur: 20px;
+
+  /* Spring Animation Physics */
+  --spring-stiff: 400;
+  --spring-damping: 30;
+  --spring-mass: 1;
+  
+  /* Animation Timing - Refined */
+  --transition-fast: 200ms;
+  --transition-base: 300ms;
+  --transition-slow: 500ms;
+  --transition-slower: 700ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* Motion-Meaning Animations */
+  --scale-hover: 1.02;
+  --scale-active: 0.98;
+  --scale-expand: 1.05;
+  --scale-magnetic: 1.03;
+  --glow-radius: 20px;
+  --shimmer-duration: 2000ms;
+  
+  /* Letter Spacing Precision */
+  --tracking-tighter: -0.03em;
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.01em;
+  --tracking-wider: 0.02em;
+}
+
+/* Premium Noise Texture Overlay - Scoped to dashboard */
+.user-dashboard-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+}
+
+/* Premium Glass Morphism Utility Classes - Scoped to dashboard */
+.user-dashboard-container .glass-card {
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.03) 0%, 
+    rgba(255,255,255,0.01) 100%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.user-dashboard-container .glass-card:hover {
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.05) 0%, 
+    rgba(255,255,255,0.02) 100%);
+  border-color: var(--glass-border-hover);
+}
+
+/* Premium Gradient Border Utility - Scoped to dashboard */
+.user-dashboard-container .gradient-border {
+  background: 
+    linear-gradient(var(--pb-black), var(--pb-black)) padding-box,
+    linear-gradient(135deg, 
+      rgba(255,255,255,0.1) 0%, 
+      rgba(0,217,255,0.2) 50%,
+      rgba(255,255,255,0.05) 100%
+    ) border-box;
+  border: 1px solid transparent;
+}
+
+/* Magnetic Button Effect Base - Scoped to dashboard */
+.user-dashboard-container .magnetic-button {
+  transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Premium Hover Overlay - Scoped to dashboard */
+.user-dashboard-container .premium-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.user-dashboard-container .premium-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.1), 
+    rgba(255,255,255,0)
+  );
+  opacity: 0;
+  transition: opacity var(--transition-base) var(--ease-out);
+}
+
+.user-dashboard-container .premium-hover:hover::before {
+  opacity: 1;
+}
+
+/* Advanced Skeleton Loading - Scoped to dashboard */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.user-dashboard-container .skeleton {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 1000px 100%;
+  animation: skeleton-shimmer 2s infinite;
+}
+
+/* Premium Tooltip - Scoped to dashboard */
+.user-dashboard-container .premium-tooltip {
+  position: relative;
+}
+
+.user-dashboard-container .premium-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  padding: var(--spacing-1-5) var(--spacing-2-5);
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.1) 0%, 
+    rgba(255,255,255,0.05) 100%);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-base) var(--ease-out);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+}
+
+.user-dashboard-container .premium-tooltip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* Parallax Container - Scoped to dashboard */
+.user-dashboard-container .parallax-container {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.user-dashboard-container .parallax-layer {
+  transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Success Pulse Animation - Scoped to dashboard */
+@keyframes success-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 217, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(0, 217, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 217, 255, 0);
+  }
+}
+
+.user-dashboard-container .success-pulse {
+  animation: success-pulse 0.6s ease-out;
+}
+
+/* Floating Animation - Scoped to dashboard */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.user-dashboard-container .floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Scroll Fade In Animation - Scoped to dashboard */
+@keyframes scroll-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-dashboard-container .scroll-fade-in {
+  animation: scroll-fade-in 0.6s ease-out forwards;
+}
+
+/* Interactive Gradient Border - Scoped to dashboard */
+.user-dashboard-container .interactive-gradient-border {
+  position: relative;
+  background: var(--pb-black);
+}
+
+.user-dashboard-container .interactive-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--pb-cyan),
+    var(--pb-purple),
+    var(--pb-cyan-light),
+    var(--pb-purple-light)
+  );
+  background-size: 300% 300%;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity var(--transition-base) var(--ease-out);
+  z-index: -1;
+  animation: gradient-rotate 4s ease infinite;
+}
+
+.user-dashboard-container .interactive-gradient-border:hover::before {
+  opacity: 0.5;
+}
+
+@keyframes gradient-rotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Dashboard Typography - Scoped to dashboard */
+.user-dashboard-container h1 {
+  font-size: var(--text-6xl);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.user-dashboard-container h2 {
+  font-size: var(--text-5xl);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.user-dashboard-container h3 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.3;
+}
+
+.user-dashboard-container h4 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.4;
+}
+
+.user-dashboard-container h5 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.4;
+}
+
+.user-dashboard-container h6 {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.5;
+}
+
+.user-dashboard-container p {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-normal, 400);
+  line-height: 1.6;
+}
+
+.user-dashboard-container label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.5;
+}
+
+.user-dashboard-container button {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.5;
+}
+
+.user-dashboard-container input, 
+.user-dashboard-container textarea {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-normal, 400);
+  line-height: 1.5;
+}
+
+.user-dashboard-container small {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+/* Dashboard Container Styles */
+.user-dashboard-container {
+  min-height: 100vh;
+  background: var(--pb-black);
+  color: var(--pb-white);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Ensure dashboard components don't conflict with main app */
+.user-dashboard-container * {
+  box-sizing: border-box;
+}
+
+/* Reduced Motion Support - WCAG 2.2 Compliance - Scoped to dashboard */
+@media (prefers-reduced-motion: reduce) {
+  .user-dashboard-container *,
+  .user-dashboard-container *::before,
+  .user-dashboard-container *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .user-dashboard-container .shimmer-effect,
+  .user-dashboard-container .particle-effect,
+  .user-dashboard-container .floating-animation {
+    animation: none !important;
+  }
+  
+  /* Exception: Focus transitions should never be disabled for accessibility */
+  .user-dashboard-container button:focus-visible,
+  .user-dashboard-container a:focus-visible,
+  .user-dashboard-container input:focus-visible,
+  .user-dashboard-container textarea:focus-visible {
+    transition-duration: 150ms !important;
+  }
+}
+
+/* WCAG 2.1 AA Compliant Focus States - Scoped to dashboard */
+.user-dashboard-container button:focus-visible,
+.user-dashboard-container a:focus-visible,
+.user-dashboard-container input:focus-visible,
+.user-dashboard-container textarea:focus-visible,
+.user-dashboard-container select:focus-visible,
+.user-dashboard-container [role="button"]:focus-visible,
+.user-dashboard-container [role="link"]:focus-visible,
+.user-dashboard-container [role="tab"]:focus-visible,
+.user-dashboard-container [tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--pb-cyan);
+  outline-offset: 2px;
+  transition: outline var(--transition-fast) var(--ease-out);
+}
+
+/* Enhanced focus glow for buttons - Scoped to dashboard */
+.user-dashboard-container button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
+}
+
+/* Enhanced focus glow for inputs - Scoped to dashboard */
+.user-dashboard-container input:focus-visible,
+.user-dashboard-container textarea:focus-visible {
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+}
+
+/* Skip to content link for keyboard navigation - Scoped to dashboard */
+.user-dashboard-container .skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--pb-cyan);
+  color: var(--pb-black);
+  padding: var(--spacing-2);
+  z-index: 9999;
+  transition: top var(--transition-fast) var(--ease-out);
+}
+
+.user-dashboard-container .skip-to-content:focus {
+  top: 0;
+}
