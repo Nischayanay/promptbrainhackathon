@@ -330,6 +330,7 @@ export function UnifiedAuthForm({
                         border: "1px solid #D1D5DB",
                         borderRadius: "8px",
                         backgroundColor: "#FFFFFF",
+                        color: "#111827",
                         padding: "10px 12px 10px 36px",
                       }}
                       placeholder="Your name"
@@ -369,6 +370,7 @@ export function UnifiedAuthForm({
                     border: "1px solid #D1D5DB",
                     borderRadius: "8px",
                     backgroundColor: "#FFFFFF",
+                    color: "#111827",
                     padding: "10px 12px 10px 36px",
                   }}
                   placeholder="you@example.com"
@@ -406,6 +408,7 @@ export function UnifiedAuthForm({
                     border: "1px solid #D1D5DB",
                     borderRadius: "8px",
                     backgroundColor: "#FFFFFF",
+                    color: "#111827",
                     padding: "10px 12px 10px 36px",
                   }}
                   placeholder="••••••••"

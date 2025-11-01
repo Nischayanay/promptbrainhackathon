@@ -203,7 +203,7 @@ export function PBAuthForm({ onAuthSuccess }: PBAuthFormProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 h-12 border border-gray-300 rounded text-sm bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-gray-700"
+                  className="pl-10 h-12 border border-gray-300 rounded text-sm bg-white text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-gray-500"
                   placeholder="you@example.com"
                   required
                 />
@@ -224,7 +224,7 @@ export function PBAuthForm({ onAuthSuccess }: PBAuthFormProps) {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-12 border border-gray-300 rounded text-sm bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-gray-700"
+                  className="pl-10 h-12 border border-gray-300 rounded text-sm bg-white text-gray-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-gray-500"
                   placeholder="••••••••"
                   required
                 />
