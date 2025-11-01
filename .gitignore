@@ -4,3 +4,31 @@ node_modules
 .env.local
 .env.production
 .env.staging
+# Kiro generated files - exclude from repository
+*_REPORT.md
+*_SUMMARY.md
+*_COMPLETE.md
+FINAL_*.*
+*-summary.md
+integration-summary.md
+test-user-flow.md
+SUPABASE_DEBUGGING_GUIDE.md
+
+# Debug and test files
+*-test*.js
+debug-*.js
+fix-*.js
+validate-*.js
+comprehensive-qa-audit.js
+demo-user-flow.js
+add-test-credits.js
+qa-audit-test.js
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

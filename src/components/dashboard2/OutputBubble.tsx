@@ -1,83 +1,89 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Copy, ChevronDown, Check } from 'lucide-react'
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Check, ChevronDown, Copy } from "lucide-react";
 
-type Mode = 'ideate' | 'flow'
-type OutputFormat = 'english' | 'json'
+type Mode = "ideate" | "flow";
+type OutputFormat = "english" | "json";
 
 interface ChatMessage {
-  id: string
-  mode: Mode
-  timestamp: string
-  input: string
-  output: string
-  title: string
+  id: string;
+  mode: Mode;
+  timestamp: string;
+  input: string;
+  output: string;
+  title: string;
 }
 
 interface OutputBubbleProps {
-  message: ChatMessage
-  index: number
+  message: ChatMessage;
+  index: number;
 }
 
 export function OutputBubble({ message, index }: OutputBubbleProps) {
-  const [outputFormat, setOutputFormat] = useState<OutputFormat>('english')
-  const [copied, setCopied] = useState(false)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [outputFormat, setOutputFormat] = useState<OutputFormat>("english");
+  const [copied, setCopied] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const copyToClipboard = async () => {
     try {
-      let textToCopy = message.output
-      
-      if (outputFormat === 'json') {
-        textToCopy = JSON.stringify({
-          mode: message.mode,
-          input: message.input,
-          output: message.output,
-          timestamp: message.timestamp,
-          title: message.title
-        }, null, 2)
+      let textToCopy = message.output;
+
+      if (outputFormat === "json") {
+        textToCopy = JSON.stringify(
+          {
+            mode: message.mode,
+            input: message.input,
+            output: message.output,
+            timestamp: message.timestamp,
+            title: message.title,
+          },
+          null,
+          2,
+        );
       }
-      
-      await navigator.clipboard.writeText(textToCopy)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy:', error)
+      console.error("Failed to copy:", error);
     }
-  }
+  };
 
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+    return new Date(timestamp).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const getModeColor = (mode: Mode) => {
-    return mode === 'ideate' ? '#6E00FF' : '#1D4ED8'
-  }
+    return mode === "ideate" ? "#6E00FF" : "#1D4ED8";
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.32, 
+      transition={{
+        duration: 0.32,
         ease: [0.2, 0.9, 0.2, 1],
-        delay: index * 0.1 
+        delay: index * 0.1,
       }}
       className="bg-[#1A1A1A] rounded-2xl border border-[#FFD95A]/10 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:border-[#FFD95A]/20 transition-all group"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div 
+          <div
             className="px-3 py-1 rounded-full text-xs font-medium text-white"
-            style={{ 
-              background: `linear-gradient(90deg, ${getModeColor(message.mode)}, #3B82F6)` 
+            style={{
+              background: `linear-gradient(90deg, ${
+                getModeColor(message.mode)
+              }, #3B82F6)`,
             }}
           >
-            {message.mode === 'ideate' ? '⚡ Ideate' : '🌊 Flow'}
+            {message.mode === "ideate" ? "⚡ Ideate" : "🌊 Flow"}
           </div>
           <span className="text-[#A6A6A6] text-sm">
             {formatTimestamp(message.timestamp)}
@@ -94,11 +100,9 @@ export function OutputBubble({ message, index }: OutputBubbleProps) {
             whileTap={{ scale: 0.9 }}
             title={`Copy as ${outputFormat.toUpperCase()}`}
           >
-            {copied ? (
-              <Check className="w-4 h-4 text-green-400" />
-            ) : (
-              <Copy className="w-4 h-4" />
-            )}
+            {copied
+              ? <Check className="w-4 h-4 text-green-400" />
+              : <Copy className="w-4 h-4" />}
           </motion.button>
 
           {/* Format Dropdown */}
@@ -122,8 +126,8 @@ export function OutputBubble({ message, index }: OutputBubbleProps) {
               >
                 <button
                   onClick={() => {
-                    setOutputFormat('english')
-                    setDropdownOpen(false)
+                    setOutputFormat("english");
+                    setDropdownOpen(false);
                   }}
                   className="block w-full text-left px-3 py-1 text-sm text-[#A6A6A6] hover:text-white hover:bg-[#FFD95A]/10 transition-colors"
                 >
@@ -131,8 +135,8 @@ export function OutputBubble({ message, index }: OutputBubbleProps) {
                 </button>
                 <button
                   onClick={() => {
-                    setOutputFormat('json')
-                    setDropdownOpen(false)
+                    setOutputFormat("json");
+                    setDropdownOpen(false);
                   }}
                   className="block w-full text-left px-3 py-1 text-sm text-[#A6A6A6] hover:text-white hover:bg-[#FFD95A]/10 transition-colors"
                 >
@@ -160,5 +164,5 @@ export function OutputBubble({ message, index }: OutputBubbleProps) {
         {message.output}
       </motion.div>
     </motion.div>
-  )
+  );
 }

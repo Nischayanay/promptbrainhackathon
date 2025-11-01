@@ -2,9 +2,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
 
 /* Premium Dashboard Styles */
 @import "./styles/premium-dashboard.css";
+/* Theme-specific routing styles */
+@import "./styles/themes.css";
+/* PBAuth Integration Styles */
+@import "./styles/pbauth-integration.css";
+/* Dashboard Integration Styles */
+@import "./styles/dashboard-integration.css";
+/* User Dashboard Integration Styles */
+@import "./styles/user-dashboard-integration.css";
 /*! tailwindcss v4.1.3 | MIT License | https://tailwindcss.com */
 @layer properties {
   @supports (((-webkit-hyphens: none)) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {

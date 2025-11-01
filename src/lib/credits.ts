@@ -63,33 +63,24 @@ export function useCredits(): CreditsState {
     if (amount <= 0) return true;
 
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session?.access_token) return false;
-
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/credits/spend`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount,
-          reason,
-          prompt_id: promptId
-        })
+      const { data, error } = await supabase.rpc('spend_credits', {
+        p_user_id: userId,
+        p_prompt_id: promptId || null,
+        p_amount: amount,
+        p_reason: reason
       });
 
-      const result = await response.json();
+      if (error) {
+        console.error('Credit spend failed:', error);
+        await refresh();
+        return false;
+      }
       
-      if (result.success) {
-        setCredits(result.balance);
-        if (result.daily_refresh) {
-          setDailyRefresh(result.daily_refresh);
-        }
+      if (data?.success) {
+        setCredits(data.balance);
         return true;
       } else {
-        console.error('Credit spend failed:', result.error);
-        // Refresh balance to sync with server
+        console.error('Credit spend failed:', data?.error);
         await refresh();
         return false;
       }
@@ -106,28 +97,22 @@ export function useCredits(): CreditsState {
     if (!userId || amount <= 0) return false;
 
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session?.access_token) return false;
-
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/credits/add`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount,
-          reason
-        })
+      const { data, error } = await supabase.rpc('add_credits', {
+        p_user_id: userId,
+        p_amount: amount,
+        p_reason: reason
       });
 
-      const result = await response.json();
+      if (error) {
+        console.error('Credit earn failed:', error);
+        return false;
+      }
       
-      if (result.success) {
-        setCredits(result.balance);
+      if (data?.success) {
+        setCredits(data.balance);
         return true;
       } else {
-        console.error('Credit earn failed:', result.error);
+        console.error('Credit earn failed:', data?.error);
         return false;
       }
     } catch (error) {
@@ -144,28 +129,21 @@ export function useCredits(): CreditsState {
 
     try {
       setIsLoading(true);
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session?.access_token) {
+      
+      const { data, error } = await supabase.rpc('get_user_balance', {
+        p_user_id: userId
+      });
+
+      if (error) {
+        console.error('Balance fetch failed:', error);
         setCredits(0);
         return;
       }
-
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/credits/balance`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${session.session.access_token}`,
-        }
-      });
-
-      const result = await response.json();
       
-      if (result.success) {
-        setCredits(result.balance);
-        if (result.daily_refresh) {
-          setDailyRefresh(result.daily_refresh);
-        }
+      if (data?.success) {
+        setCredits(data.balance);
       } else {
-        console.error('Balance fetch failed:', result.error);
+        console.error('Balance fetch failed:', data?.error);
         setCredits(0);
       }
     } catch (error) {
@@ -180,31 +158,14 @@ export function useCredits(): CreditsState {
     if (!userId) return false;
 
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session?.access_token) return false;
-
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/credits/refresh`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${session.session.access_token}`,
-        }
-      });
-
-      const result = await response.json();
-      
-      if (result.success) {
-        setCredits(result.balance);
-        setDailyRefresh(result);
-        return true;
-      } else {
-        console.error('Manual refresh failed:', result.error);
-        return false;
-      }
+      // For now, just refresh the balance. 24-hour refresh logic is handled in the backend
+      await refresh();
+      return true;
     } catch (error) {
       console.error('Manual refresh error:', error);
       return false;
     }
-  }, [userId]);
+  }, [userId, refresh]);
 
   return { credits, isLow, canSpend, isLoading, dailyRefresh, spend, earn, refresh, manualRefresh };
 }

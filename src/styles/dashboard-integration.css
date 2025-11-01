@@ -1,0 +1,151 @@
+/* Dashboard Integration Styles */
+
+/* Dashboard specific variables */
+:root {
+  --pb-black: #000000;
+  --pb-near-black: #0a0a0a;
+  --pb-white: #ffffff;
+  --pb-blue: #00d9ff;
+  --pb-dark-blue: #0099ff;
+}
+
+/* Dashboard container styling */
+.dashboard-container {
+  background: var(--pb-black);
+  color: var(--pb-white);
+  min-height: 100vh;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Chat interface styling */
+.chat-interface {
+  background: transparent;
+}
+
+.chat-message-user {
+  background: linear-gradient(135deg, var(--pb-blue), var(--pb-dark-blue));
+  color: white;
+  border-radius: 1rem;
+  padding: 0.875rem 1.25rem;
+}
+
+.chat-message-assistant {
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 0.875rem 1.25rem;
+}
+
+.chat-input-container {
+  background: #1a1a1a;
+  border: 1.5px solid #333333;
+  border-radius: 1.75rem;
+  transition: all 0.2s ease;
+}
+
+.chat-input-container:focus-within {
+  border-color: var(--pb-blue);
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+}
+
+.chat-input {
+  background: transparent;
+  color: white;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+}
+
+.chat-input::placeholder {
+  color: #666666;
+}
+
+.chat-send-button {
+  background: linear-gradient(135deg, var(--pb-blue), var(--pb-dark-blue));
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.chat-send-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+}
+
+/* Logo styling */
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.dashboard-logo-icon {
+  color: var(--pb-blue);
+}
+
+/* Quick actions styling */
+.quick-action-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.quick-action-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.slide-in-from-bottom {
+  animation: slideInFromBottom 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .chat-interface {
+    max-width: 100%;
+  }
+}

@@ -67,17 +67,17 @@ class EdgeBackendBrain {
 
       // Step 2: Check user credits if userId provided
       if (request.userId) {
-        const { data: credits, error: creditsError } = await this.supabase.rpc('get_user_credits', {
-          user_uuid: request.userId
+        const { data: balanceResult, error: creditsError } = await this.supabase.rpc('get_user_balance', {
+          p_user_id: request.userId
         });
 
-        if (creditsError || credits < 1) {
+        if (creditsError || !balanceResult?.success || balanceResult.balance < 1) {
           return {
             success: false,
             error: {
               code: 'INSUFFICIENT_CREDITS',
               message: 'Insufficient credits for enhancement',
-              details: { required: 1, available: credits || 0 }
+              details: { required: 1, available: balanceResult?.balance || 0 }
             }
           };
         }
@@ -391,11 +391,17 @@ class EdgeBackendBrain {
 
   private async deductCredits(userId: string, amount: number): Promise<void> {
     try {
-      await this.supabase.rpc('deduct_credits', {
-        user_uuid: userId,
-        amount_to_deduct: amount,
-        description_text: 'Backend Brain prompt enhancement'
+      const { data, error } = await this.supabase.rpc('spend_credits', {
+        p_user_id: userId,
+        p_amount: amount,
+        p_reason: 'Backend Brain prompt enhancement'
       });
+      
+      if (error) {
+        console.warn('Failed to deduct credits:', error);
+      } else {
+        console.log(`Credits deducted successfully. New balance: ${data.balance}`);
+      }
     } catch (error) {
       console.warn('Failed to deduct credits:', error);
     }

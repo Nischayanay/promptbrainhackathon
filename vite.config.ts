@@ -5,6 +5,21 @@
 
   export default defineConfig({
     plugins: [react()],
+    css: {
+      postcss: {
+        plugins: [],
+      },
+      preprocessorOptions: {
+        css: {
+          // Ensure CSS imports are processed correctly
+          charset: false,
+        },
+      },
+      // Enable CSS modules for .module.css files
+      modules: {
+        localsConvention: 'camelCase',
+      },
+    },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -54,9 +69,32 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      assetsDir: 'assets',
+      rollupOptions: {
+        output: {
+          assetFileNames: (assetInfo) => {
+            // Handle font files specifically
+            if (assetInfo.name && /\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name)) {
+              return 'fonts/[name]-[hash][extname]';
+            }
+            // Handle CSS files
+            if (assetInfo.name && /\.css$/i.test(assetInfo.name)) {
+              return 'css/[name]-[hash][extname]';
+            }
+            // Default for other assets
+            return 'assets/[name]-[hash][extname]';
+          },
+        },
+      },
     },
     server: {
       port: 3000,
       open: true,
+      fs: {
+        // Allow serving files from one level up to access font files
+        allow: ['..'],
+      },
     },
+    // Asset handling configuration
+    assetsInclude: ['**/*.woff', '**/*.woff2', '**/*.eot', '**/*.ttf', '**/*.otf'],
   });

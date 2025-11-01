@@ -13,6 +13,7 @@ import {
 import { useFlowMode } from "../hooks/useFlowMode";
 import { designTokens } from "../lib/designTokens";
 import { sessionManagement } from "../lib/sessionManagement";
+import { supabase } from "../lib/supabase";
 
 type Mode = "ideate" | "flow";
 
@@ -218,12 +219,37 @@ export function Dashboard2ProRedesigned() {
     const promptId = crypto.randomUUID();
 
     console.log("💳 Attempting to spend 1 credit...");
-    const spent = await spend(1, "prompt_enhancement", promptId);
-    console.log("💳 Spend result:", spent);
     
-    if (!spent) {
+    // Check and refresh credits first (lazy refresh)
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsEnhancing(false);
+        setAnnouncement("Please sign in to enhance prompts");
+        return;
+      }
+
+      // Use new credit system - spend credits via RPC
+      const { data: spendResult, error: spendError } = await supabase.rpc('spend_credits', {
+        p_user_id: user.id,
+        p_prompt_id: promptId,
+        p_amount: 1,
+        p_reason: 'prompt_enhancement'
+      });
+
+      console.log("💳 Spend result:", spendResult);
+      
+      if (spendError || !spendResult?.success) {
+        setIsEnhancing(false);
+        setAnnouncement(spendResult?.error === 'insufficient_credits' 
+          ? `Insufficient credits. You have ${spendResult?.balance || 0} credits.`
+          : "Failed to deduct credits");
+        return;
+      }
+    } catch (error) {
+      console.error("Credit deduction failed:", error);
       setIsEnhancing(false);
-      setAnnouncement("Insufficient credits to enhance prompt");
+      setAnnouncement("Credit system error. Please try again.");
       return;
     }
 
@@ -237,55 +263,50 @@ export function Dashboard2ProRedesigned() {
       console.log("🔍 DEBUG: Sending request to enhance-prompt");
       console.log("📦 Request body:", requestBody);
       
-      // Call the make-server function with correct parameters
-      const apiUrl = "https://qaugvrsaeydptmsxllcu.supabase.co/functions/v1/make-server-08c24b4c/enhance-prompt";
-      console.log("🌐 API URL:", apiUrl);
+      // Call the backend-brain-enhance edge function directly
+      console.log("🌐 Calling backend-brain-enhance function");
       
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${
-            import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTkwMDc3OSwiZXhwIjoyMDY1NDc2Nzc5fQ.mthkPFNO0QfH02TiHoA5lHbBZ02fUX2YZQGkMS4kGpc"
-          }`,
-          "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY ||
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDA3NzksImV4cCI6MjA2NTQ3Njc3OX0.Hs_rJaWcELKEBYjRQKKmLfJCcgqGJhFJvJQGJhFJvJQ",
-        },
-        body: JSON.stringify(requestBody),
+      const { data, error } = await supabase.functions.invoke('backend-brain-enhance', {
+        body: {
+          prompt: input.trim(),
+          userId: user.id,
+          options: {
+            mode: activeMode,
+            includeExamples: true
+          }
+        }
       });
 
-      console.log("📡 Response status:", response.status);
-      console.log("📡 Response headers:", Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ API Error Response:", errorText);
-        throw new Error(`API error: ${response.status} - ${errorText}`);
+      if (error) {
+        console.error("❌ Edge Function Error:", error);
+        throw new Error(error.message || 'Enhancement function failed');
       }
 
-      const data = await response.json();
-      console.log("✅ API Response:", data);
+      console.log("✅ Edge Function Response:", data);
 
       if (!data.success) {
         throw new Error(data.error || "Enhancement failed");
       }
 
+      // Handle the response from backend-brain-enhance
+      if (!data || !data.success) {
+        throw new Error(data?.error?.message || "Enhancement failed");
+      }
+
       // Extract the enhanced text from the response
-      const enhancedText = data.enhancedPrompt?.detailed ||
-        data.enhancedPrompt?.english || "";
+      const enhancedText = data.data?.enhancedText || "";
 
       if (!enhancedText) {
         throw new Error("No enhanced text in response");
       }
 
-      // Calculate mock metrics since backend doesn't provide them
+      // Use metrics from backend-brain-enhance response
       const originalLength = input.trim().length;
       const enhancedLength = enhancedText.length;
-      const enhancementRatio = enhancedLength / originalLength;
-      const qualityScore = Math.min(0.95, 0.7 + (enhancementRatio * 0.1));
-      const processingTime = 1500; // Mock processing time in ms
-      const whySummary =
+      const enhancementRatio = data.data?.metadata?.enhancementRatio || (enhancedLength / originalLength);
+      const qualityScore = data.data?.qualityScore || 0.85;
+      const processingTime = data.data?.metadata?.processingTime || 1500;
+      const whySummary = data.data?.whySummary || 
         "Enhanced with structured framework, added context, and improved clarity for better AI understanding.";
 
       // Create user message
@@ -345,8 +366,20 @@ export function Dashboard2ProRedesigned() {
     } catch (error) {
       console.error("Backend Brain failed:", error);
 
-      // Rollback credits and show error
-      await earn(1, "enhancement_failed_rollback");
+      // Rollback credits using new system
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.rpc('add_credits', {
+            p_user_id: user.id,
+            p_amount: 1,
+            p_reason: 'enhancement_failed_rollback'
+          });
+        }
+      } catch (refundError) {
+        console.error("Failed to refund credits:", refundError);
+      }
+
       const errorMessage = error instanceof Error
         ? error.message
         : "Unknown error occurred";

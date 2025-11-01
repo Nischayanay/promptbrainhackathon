@@ -1,11 +1,24 @@
 import { motion } from 'framer-motion'
 import { User, ChevronDown } from 'lucide-react'
+import { useAuth } from '../../contexts/AuthContext'
+import { useCredits } from '../../contexts/CreditContext'
 
 interface HeaderBarProps {
-  credits: number
+  credits?: number // Make optional since we'll get from context
 }
 
-export function HeaderBar({ credits }: HeaderBarProps) {
+export function HeaderBar({ credits: propCredits }: HeaderBarProps) {
+  const { user, signOut } = useAuth()
+  const { balance, loading } = useCredits()
+  
+  // Use credits from context if available, otherwise fall back to prop
+  const credits = balance !== undefined ? balance : (propCredits || 0)
+
+  const handleSignOut = async () => {
+    await signOut()
+    // Redirect to landing page or login
+    window.location.href = '/'
+  }
   return (
     <header className="bg-[#0D0D0D]/80 backdrop-blur-md border-b border-[#FFD95A]/10 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-6 py-4">
@@ -32,7 +45,9 @@ export function HeaderBar({ credits }: HeaderBarProps) {
               className="bg-[#1A1A1A] border border-[#FFD95A]/20 rounded-full px-4 py-2 flex items-center space-x-2"
             >
               <div className="w-2 h-2 bg-gradient-to-r from-[#6E00FF] to-[#3B82F6] rounded-full"></div>
-              <span className="text-white font-medium">{credits}</span>
+              <span className="text-white font-medium">
+                {loading ? '...' : credits}
+              </span>
               <span className="text-[#A6A6A6] text-sm">credits</span>
             </motion.div>
 
@@ -58,9 +73,12 @@ export function HeaderBar({ credits }: HeaderBarProps) {
                   Billing
                 </a>
                 <div className="border-t border-[#FFD95A]/10 my-1"></div>
-                <a href="#" className="block px-4 py-2 text-sm text-[#A6A6A6] hover:text-white hover:bg-[#FFD95A]/10 transition-colors">
+                <button 
+                  onClick={handleSignOut}
+                  className="block w-full text-left px-4 py-2 text-sm text-[#A6A6A6] hover:text-white hover:bg-[#FFD95A]/10 transition-colors"
+                >
                   Sign Out
-                </a>
+                </button>
               </div>
             </div>
           </div>

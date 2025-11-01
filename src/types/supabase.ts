@@ -136,34 +136,88 @@ export type Database = {
       }
       user_credits: {
         Row: {
-          created_at: string
-          credits_remaining: number
-          credits_total: number
-          daily_allowance: number | null
-          id: string
-          last_reset_at: string | null
+          balance: number
           updated_at: string
           user_id: string
         }
         Insert: {
-          created_at?: string
-          credits_remaining?: number
-          credits_total?: number
-          daily_allowance?: number | null
-          id?: string
-          last_reset_at?: string | null
+          balance?: number
           updated_at?: string
           user_id: string
         }
         Update: {
-          created_at?: string
-          credits_remaining?: number
-          credits_total?: number
-          daily_allowance?: number | null
-          id?: string
-          last_reset_at?: string | null
+          balance?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      credits_log: {
+        Row: {
+          action: string
+          amount: number
+          balance_after: number
+          created_at: string
+          id: string
+          prompt_id: string | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          amount: number
+          balance_after: number
+          created_at?: string
+          id?: string
+          prompt_id?: string | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          id?: string
+          prompt_id?: string | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          plan_type: string
+          preferences: Json | null
+          timezone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          plan_type?: string
+          preferences?: Json | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          plan_type?: string
+          preferences?: Json | null
+          timezone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -196,29 +250,39 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      decrement_user_credits: {
-        Args: { p_user_id: string }
-        Returns: number
-      }
-      deduct_credits: {
+      add_credits: {
         Args: {
-          enhancement_type?: string
-          prompt_uuid?: string
-          user_uuid: string
+          p_user_id: string
+          p_amount: number
+          p_reason?: string
         }
-        Returns: boolean
+        Returns: Json
       }
-      get_user_credits: {
-        Args: { user_uuid: string }
-        Returns: number
+      get_user_balance: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
-      refresh_monthly_credits: {
-        Args: { user_uuid: string }
-        Returns: boolean
+      spend_credits: {
+        Args: {
+          p_user_id: string
+          p_prompt_id?: string
+          p_amount?: number
+          p_reason?: string
+        }
+        Returns: Json
       }
-      refund_credits: {
-        Args: { enhancement_type?: string; reason?: string; user_uuid: string }
-        Returns: boolean
+      get_user_profile_with_credits: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      update_user_profile: {
+        Args: {
+          p_user_id: string
+          p_full_name?: string
+          p_timezone?: string
+          p_preferences?: Json
+        }
+        Returns: Json
       }
     }
     Enums: {

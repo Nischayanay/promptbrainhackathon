@@ -33,7 +33,7 @@ export function PRDLandingPage({ onNavigateToSignup, onNavigateToLogin, AuthComp
       
       {/* Hero Section - Premium storytelling with AI neuron effects */}
       <Hero 
-        onStartEnhancing={onNavigateToLogin}
+        onStartEnhancing={onNavigateToSignup}
         onSeeHowItWorks={() => {
           // Smooth scroll to value props section
           const valueSection = document.querySelector('[data-section="value"]');
