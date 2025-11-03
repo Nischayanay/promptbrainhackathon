@@ -58,7 +58,11 @@ function AppContent() {
       <main id="main-content" role="main">
         <PBAuthPage
           onNavigateToLanding={() => navigate(routeConfig.landing)}
-          onAuthSuccess={() => navigate(routeConfig.dashboard)}
+          onAuthSuccess={() => {
+            console.log('🚀 onAuthSuccess callback triggered!');
+            // Force page reload to sync auth state between PBAuth and main app
+            window.location.href = '/dashboard';
+          }}
         />
       </main>
     </RouteTransition>

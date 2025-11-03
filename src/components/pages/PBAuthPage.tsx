@@ -12,6 +12,8 @@ interface PBAuthPageProps {
 }
 
 export function PBAuthPage({ onNavigateToLanding, onAuthSuccess }: PBAuthPageProps) {
+  console.log('🔧 PBAuthPage props:', { onAuthSuccess: !!onAuthSuccess });
+  
   return (
     <div className="pbauth-wrapper">
       <PBAuthApp onAuthSuccess={onAuthSuccess} />

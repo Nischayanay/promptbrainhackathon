@@ -6,6 +6,8 @@ interface PBAuthAppProps {
 }
 
 export default function App({ onAuthSuccess }: PBAuthAppProps) {
+  console.log('🔧 PBAuthApp props:', { onAuthSuccess: !!onAuthSuccess });
+  
   return (
     <div className="h-screen w-full flex flex-col lg:flex-row overflow-hidden">
       {/* Left Side - Creative Zone */}

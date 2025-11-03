@@ -12,6 +12,7 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ onAuthSuccess }: AuthFormProps) {
+  console.log('🔧 AuthForm props:', { onAuthSuccess: !!onAuthSuccess });
   const [mode, setMode] = useState<AuthMode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -36,14 +37,14 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
           setMessage(
             "✅ Account created successfully! Welcome to PromptBrain!",
           );
-          // Use callback instead of hardcoded redirect
+          // Use callback for redirect
           setTimeout(() => {
             if (onAuthSuccess) {
               onAuthSuccess();
             } else {
               window.location.href = "/dashboard";
             }
-          }, 2000);
+          }, 1500);
         } else {
           console.error("Signup failed:", result.error);
           setMessage(`❌ Signup failed: ${result.error}`);
@@ -58,9 +59,7 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
             if (onAuthSuccess) {
               onAuthSuccess();
             } else {
-              // Force reload to sync auth state
               window.location.href = "/dashboard";
-              window.location.reload();
             }
           }, 1000);
         } else {
