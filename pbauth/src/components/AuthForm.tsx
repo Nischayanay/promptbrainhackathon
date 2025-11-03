@@ -7,7 +7,11 @@ import { Lock, Mail, User } from "lucide-react";
 
 type AuthMode = "login" | "signup";
 
-export function AuthForm() {
+interface AuthFormProps {
+  onAuthSuccess?: () => void;
+}
+
+export function AuthForm({ onAuthSuccess }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,9 +36,13 @@ export function AuthForm() {
           setMessage(
             "✅ Account created successfully! Welcome to PromptBrain!",
           );
-          // Redirect to main app after successful signup
+          // Use callback instead of hardcoded redirect
           setTimeout(() => {
-            window.location.href = "http://localhost:3000/dashboard";
+            if (onAuthSuccess) {
+              onAuthSuccess();
+            } else {
+              window.location.href = "/dashboard";
+            }
           }, 2000);
         } else {
           console.error("Signup failed:", result.error);
@@ -45,9 +53,15 @@ export function AuthForm() {
         if (result.success) {
           console.log("Login successful:", result.user);
           setMessage("✅ Login successful! Redirecting...");
-          // Redirect to main app after successful login
+          // Force page reload to ensure main app detects auth state
           setTimeout(() => {
-            window.location.href = "http://localhost:3000/dashboard";
+            if (onAuthSuccess) {
+              onAuthSuccess();
+            } else {
+              // Force reload to sync auth state
+              window.location.href = "/dashboard";
+              window.location.reload();
+            }
           }, 1000);
         } else {
           console.error("Login failed:", result.error);

@@ -1,7 +1,11 @@
 import { CreativeZone } from "./components/CreativeZone";
 import { AuthForm } from "./components/AuthForm";
 
-export default function App() {
+interface PBAuthAppProps {
+  onAuthSuccess?: () => void;
+}
+
+export default function App({ onAuthSuccess }: PBAuthAppProps) {
   return (
     <div className="h-screen w-full flex flex-col lg:flex-row overflow-hidden">
       {/* Left Side - Creative Zone */}
@@ -11,7 +15,7 @@ export default function App() {
 
       {/* Right Side - Auth Form */}
       <div className="w-full lg:w-1/2 h-full overflow-hidden">
-        <AuthForm />
+        <AuthForm onAuthSuccess={onAuthSuccess} />
       </div>
     </div>
   );

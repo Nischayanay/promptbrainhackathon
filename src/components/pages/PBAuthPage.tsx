@@ -14,7 +14,7 @@ interface PBAuthPageProps {
 export function PBAuthPage({ onNavigateToLanding, onAuthSuccess }: PBAuthPageProps) {
   return (
     <div className="pbauth-wrapper">
-      <PBAuthApp />
+      <PBAuthApp onAuthSuccess={onAuthSuccess} />
       
       {/* Navigation overlay */}
       {onNavigateToLanding && (
