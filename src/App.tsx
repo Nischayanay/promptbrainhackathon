@@ -58,10 +58,12 @@ function AppContent() {
       <main id="main-content" role="main">
         <PBAuthPage
           onNavigateToLanding={() => navigate(routeConfig.landing)}
-          onAuthSuccess={() => {
+          onAuthSuccess={async () => {
             console.log('🚀 onAuthSuccess callback triggered!');
-            // Force page reload to sync auth state between PBAuth and main app
-            window.location.href = '/dashboard';
+            // Wait for auth state to sync, then navigate
+            setTimeout(() => {
+              navigate(routeConfig.dashboard);
+            }, 500);
           }}
         />
       </main>

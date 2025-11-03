@@ -28,7 +28,7 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
 
     try {
       // Import local Supabase auth functions
-      const { signIn, signUp } = await import("../lib/supabase");
+      const { signIn, signUp, supabase } = await import("../lib/supabase");
 
       if (mode === "signup") {
         const result = await signUp(email, password, name);
@@ -37,12 +37,15 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
           setMessage(
             "✅ Account created successfully! Welcome to PromptBrain!",
           );
-          // Use callback for redirect
-          setTimeout(() => {
-            if (onAuthSuccess) {
+          // Wait for session to be established
+          setTimeout(async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session && onAuthSuccess) {
               onAuthSuccess();
-            } else {
+            } else if (session) {
               window.location.href = "/dashboard";
+            } else {
+              setMessage("❌ Session not established. Please try again.");
             }
           }, 1500);
         } else {
@@ -54,12 +57,17 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
         if (result.success) {
           console.log("Login successful:", result.user);
           setMessage("✅ Login successful! Redirecting...");
-          // Force page reload to ensure main app detects auth state
-          setTimeout(() => {
-            if (onAuthSuccess) {
+          
+          // Wait for session to be fully established
+          setTimeout(async () => {
+            // Verify session exists before redirecting
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session && onAuthSuccess) {
               onAuthSuccess();
-            } else {
+            } else if (session) {
               window.location.href = "/dashboard";
+            } else {
+              setMessage("❌ Session not established. Please try again.");
             }
           }, 1000);
         } else {

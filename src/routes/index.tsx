@@ -18,9 +18,14 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, isAuthed }: ProtectedRouteProps) {
+  console.log('🔒 ProtectedRoute check:', { isAuthed });
+  
   if (!isAuthed) {
-    return <Navigate to={routeConfig.login} replace />;
+    console.log('❌ Not authenticated, redirecting to login');
+    return <Navigate to={routeConfig.auth} replace />;
   }
+  
+  console.log('✅ Authenticated, rendering protected content');
   return <>{children}</>;
 }
 

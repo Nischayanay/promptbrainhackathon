@@ -56,7 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = authService.onAuthStateChange(async (event, session) => {
       console.log('Auth state change:', event, session?.user?.email)
       
-      if (session?.user) {
+      if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
         setSession(session)
         
