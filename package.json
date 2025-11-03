@@ -79,6 +79,7 @@
     "dev": "vite",
     "dev:local": "cp .env.local.development .env.local && vite",
     "build": "vite build",
+    "build:analyze": "vite build --mode analyze",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

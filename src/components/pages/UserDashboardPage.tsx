@@ -1,7 +1,7 @@
 import React, { ErrorInfo, ReactNode, useEffect } from "react";
 
-// Import the current dashboard component
-import { Dashboard2ProRedesigned } from "../Dashboard2ProRedesigned";
+// Import the custom user dashboard App component
+import UserDashboardApp from "../../custom user dashboard/src/App";
 
 // Import dashboard styles
 import "../../styles/user-dashboard-integration.css";

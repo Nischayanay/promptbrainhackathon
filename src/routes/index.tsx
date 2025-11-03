@@ -6,7 +6,7 @@ export const routeConfig = {
   landing: "/",
   login: "/login", 
   signup: "/signup",
-  dashboard: "/dashboard",
+  dashboard: "/dashboard", // Now points to custom dashboard
   profile: "/profile",
   auth: "/auth", // For the pbauth component
 } as const;

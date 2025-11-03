@@ -70,8 +70,16 @@
       target: 'esnext',
       outDir: 'build',
       assetsDir: 'assets',
+      sourcemap: false,
+      minify: 'esbuild',
       rollupOptions: {
         output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tooltip'],
+            supabase: ['@supabase/supabase-js'],
+            animations: ['framer-motion', 'motion'],
+          },
           assetFileNames: (assetInfo) => {
             // Handle font files specifically
             if (assetInfo.name && /\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name)) {

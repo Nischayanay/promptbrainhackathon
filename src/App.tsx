@@ -5,7 +5,8 @@ import { AppLayout } from "./components/layouts/AppLayout";
 // Import custom components
 import { CustomAuthLayout } from "./components/auth/CustomAuthLayout";
 import { PBAuthPage } from "./components/pages/PBAuthPage";
-import { UserDashboardPage } from "./components/pages/UserDashboardPage";
+
+import { CustomDashboardPage } from "./components/pages/CustomDashboardPage";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { ProtectedRoute, routeConfig, ThemeWrapper } from "./routes/index";
 import { RouteTransition } from "./components/common/RouteTransition";
@@ -16,16 +17,9 @@ function AppContent() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Show loading screen while checking session
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-landing-black flex items-center justify-center">
-        <div className="text-landing-white text-xl">
-          Loading PromptBrain...
-        </div>
-      </div>
-    );
-  }
+  console.log('AppContent render:', { user: user?.email, loading });
+
+  // Removed loading state - let the app render normally
 
   // Below: Router-based rendering replaces manual page switching
 
@@ -53,7 +47,7 @@ function AppContent() {
     <ProtectedRoute isAuthed={!!user}>
       <RouteTransition>
         <main id="main-content" role="main">
-          <UserDashboardPage />
+          <CustomDashboardPage />
         </main>
       </RouteTransition>
     </ProtectedRoute>
