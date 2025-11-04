@@ -205,12 +205,19 @@ Quality Score: 85% | Enhancement Ratio: 3.2x`;
             boxShadow: isFocused 
               ? 'var(--shadow-cyan-lg), inset 0 1px 0 rgba(255,255,255,0.1)' 
               : 'var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.05)',
-            transition: 'all var(--transition-base) var(--ease-out)'
+            transition: 'all var(--transition-base) var(--ease-out)',
+            pointerEvents: 'auto'
           }}
           animate={{
             scale: isTyping ? 1.01 : 1
           }}
           transition={spring}
+          onClick={() => {
+            const textarea = document.getElementById('prompt-input') as HTMLTextAreaElement;
+            if (textarea) {
+              textarea.focus();
+            }
+          }}
         >
           {/* Text Input */}
           <textarea
@@ -234,6 +241,10 @@ Quality Score: 85% | Enhancement Ratio: 3.2x`;
               setIsFocused(true);
               setHasInteracted(true);
             }}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.currentTarget.focus();
+            }}
             onBlur={handleBlur}
             onKeyPress={handleKeyPress}
             rows={1}
@@ -249,7 +260,9 @@ Quality Score: 85% | Enhancement Ratio: 3.2x`;
               minHeight: 'var(--min-touch-target, 44px)',
               background: 'transparent',
               border: 'none',
-              width: '100%'
+              width: '100%',
+              pointerEvents: 'auto',
+              zIndex: 10
             }}
             aria-label="Prompt engineering input"
             aria-describedby="prompt-description prompt-validation"
