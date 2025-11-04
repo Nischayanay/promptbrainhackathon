@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, ChevronDown, AudioWaveform, Send, Sparkles } from 'lucide-react';
+import { Mic, AudioWaveform, Send, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from './PremiumToast';
 import { EmptyState } from './EmptyState';
@@ -32,8 +32,7 @@ export function SearchInterface() {
   const [output, setOutput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedMode, setSelectedMode] = useState('Auto');
+
   const [isTyping, setIsTyping] = useState(false);
   const [isFirstUse, setIsFirstUse] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -44,7 +43,7 @@ export function SearchInterface() {
   const [particlePos, setParticlePos] = useState({ x: 0, y: 0 });
   const sendButtonRef = useRef<HTMLButtonElement>(null);
 
-  const dropdownOptions = ['Auto', 'Creative', 'Precise', 'Balanced'];
+
 
   // Check if first use
   useEffect(() => {
@@ -267,81 +266,6 @@ Quality Score: 85% | Enhancement Ratio: 3.2x`;
 
           {/* Right Controls */}
           <div className="flex items-center gap-3">
-            {/* Mode Dropdown */}
-            <div className="relative">
-              <motion.button 
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center text-white/80 hover:text-white hover:bg-white/5 rounded-xl"
-                style={{
-                  gap: 'var(--spacing-1)',
-                  padding: 'var(--spacing-1) var(--spacing-2)',
-                  fontSize: 'var(--text-sm)',
-                  minHeight: 'var(--min-touch-target)',
-                  transition: 'all var(--transition-fast) var(--ease-out)'
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label={`Mode: ${selectedMode}`}
-                aria-expanded={showDropdown}
-                aria-haspopup="true"
-              >
-                <span>{selectedMode}</span>
-                <ChevronDown 
-                  className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`}
-                  style={{ transition: 'transform var(--transition-base) var(--ease-out)' }}
-                  aria-hidden="true"
-                />
-              </motion.button>
-
-              <AnimatePresence>
-                {showDropdown && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={spring}
-                    className="absolute bottom-full right-0 w-36 glass-card overflow-hidden"
-                    style={{ 
-                      marginBottom: 'var(--spacing-2)',
-                      borderRadius: 'var(--radius-lg)',
-                      boxShadow: 'var(--shadow-2xl)'
-                    }}
-                    role="menu"
-                    aria-label="Mode selection"
-                  >
-                    {dropdownOptions.map((option, index) => (
-                      <motion.button
-                        key={option}
-                        onClick={() => {
-                          setSelectedMode(option);
-                          setShowDropdown(false);
-                        }}
-                        className="w-full text-left text-white hover:bg-[#00D9FF]/10 hover:text-[#00D9FF] premium-hover"
-                        style={{
-                          padding: 'var(--spacing-2) var(--spacing-2-5)',
-                          fontSize: 'var(--text-sm)',
-                          minHeight: 'var(--min-touch-target)',
-                          transition: 'all var(--transition-fast) var(--ease-out)'
-                        }}
-                        whileHover={{ x: 4 }}
-                        transition={spring}
-                        role="menuitem"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            setSelectedMode(option);
-                            setShowDropdown(false);
-                          }
-                        }}
-                      >
-                        {option}
-                      </motion.button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
 
             {/* Send/Voice Button */}
             {value.trim() ? (
