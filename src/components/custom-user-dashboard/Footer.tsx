@@ -13,9 +13,9 @@ export function Footer() {
 
   const navigationLinks = ['Feedbacks', 'Careers', 'Pricing'];
   const socialLinks = [
-    { name: 'Instagram', url: '#' },
-    { name: 'X', url: '#' },
-    { name: 'Telegram', url: '#' }
+    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/anay-bauskar' },
+    { name: 'X', url: 'https://x.com/anaybauskar' },
+    { name: 'Instagram', url: 'https://www.instagram.com/promptbrain.io/' }
   ];
 
   const handleCopyEmail = () => {
