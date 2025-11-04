@@ -3,7 +3,34 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Lock, Mail, User } from "lucide-react";
+import { Lock, Mail, User, Eye, EyeOff } from "lucide-react";
+
+// Add CSS for black placeholder text
+const inputStyles = `
+  .auth-input::placeholder {
+    color: #111827 !important;
+    opacity: 0.7;
+  }
+  .auth-input::-webkit-input-placeholder {
+    color: #111827 !important;
+    opacity: 0.7;
+  }
+  .auth-input::-moz-placeholder {
+    color: #111827 !important;
+    opacity: 0.7;
+  }
+  .auth-input:-ms-input-placeholder {
+    color: #111827 !important;
+    opacity: 0.7;
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = inputStyles;
+  document.head.appendChild(styleElement);
+}
 
 type AuthMode = "login" | "signup";
 
@@ -12,7 +39,10 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ onAuthSuccess }: AuthFormProps) {
-  console.log('🔧 AuthForm props:', { onAuthSuccess: !!onAuthSuccess });
+  console.log('🔧 AuthForm initialized with callback:', { 
+    hasCallback: !!onAuthSuccess,
+    callbackType: typeof onAuthSuccess 
+  });
   const [mode, setMode] = useState<AuthMode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,6 +50,7 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,51 +58,44 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
     setMessage("");
 
     try {
+      console.log("🔧 Starting authentication process...");
       // Import local Supabase auth functions
-      const { signIn, signUp, supabase } = await import("../lib/supabase");
+      const { signIn, signUp } = await import("../lib/supabase");
 
       if (mode === "signup") {
         const result = await signUp(email, password, name);
         if (result.success) {
-          console.log("Signup successful:", result.user);
-          setMessage(
-            "✅ Account created successfully! Welcome to PromptBrain!",
-          );
-          // Wait for session to be established
-          setTimeout(async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session && onAuthSuccess) {
+          console.log("✅ Signup successful:", result.user);
+          setMessage("✅ Account created! Redirecting...");
+          setTimeout(() => {
+            if (onAuthSuccess) {
+              console.log("🚀 Calling onAuthSuccess callback");
               onAuthSuccess();
-            } else if (session) {
-              window.location.href = "/dashboard";
             } else {
-              setMessage("❌ Session not established. Please try again.");
+              console.log("🚀 No callback, using window.location");
+              window.location.href = "/dashboard";
             }
-          }, 1500);
+          }, 1000);
         } else {
-          console.error("Signup failed:", result.error);
+          console.error("❌ Signup failed:", result.error);
           setMessage(`❌ Signup failed: ${result.error}`);
         }
       } else {
         const result = await signIn(email, password);
         if (result.success) {
-          console.log("Login successful:", result.user);
+          console.log("✅ Login successful:", result.user);
           setMessage("✅ Login successful! Redirecting...");
-          
-          // Wait for session to be fully established
-          setTimeout(async () => {
-            // Verify session exists before redirecting
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session && onAuthSuccess) {
+          setTimeout(() => {
+            if (onAuthSuccess) {
+              console.log("🚀 Calling onAuthSuccess callback");
               onAuthSuccess();
-            } else if (session) {
-              window.location.href = "/dashboard";
             } else {
-              setMessage("❌ Session not established. Please try again.");
+              console.log("🚀 No callback, using window.location");
+              window.location.href = "/dashboard";
             }
           }, 1000);
         } else {
-          console.error("Login failed:", result.error);
+          console.error("❌ Login failed:", result.error);
           setMessage(`❌ Login failed: ${result.error}`);
         }
       }
@@ -133,55 +157,22 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          {/* Section 1: Branding Header */}
-          <div className="text-center" style={{ marginBottom: "24px" }}>
-            {/* Logo & Brand Name */}
-            <div className="flex items-center justify-center mb-1">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-2">
-                <svg
-                  className="w-5 h-5 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-              </div>
-              <h1
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "600",
-                  color: "#111827",
-                  margin: "0",
-                }}
-              >
-                PromptBrain
-              </h1>
-            </div>
-            {/* Tagline */}
-            <p
-              style={{
-                fontSize: "14px",
-                fontWeight: "400",
-                color: "#6B7280",
-                margin: "4px 0 0 0",
-              }}
-            >
-              Smarter Prompts, Sharper Minds
-            </p>
-          </div>
 
-          {/* Section 2: Form Header */}
-          <h2
+
+          {/* Section 1: Form Header - Center Aligned with Larger Size */}
+          <h1
             style={{
-              fontSize: "22px",
-              fontWeight: "600",
+              fontSize: "32px",
+              fontWeight: "700",
               color: "#111827",
-              textAlign: "left",
-              marginBottom: "20px",
+              textAlign: "center",
+              marginBottom: "32px",
+              fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+              letterSpacing: "-0.02em",
             }}
           >
             Welcome Back
-          </h2>
+          </h1>
 
           {/* Section 3: OAuth (SSO) Buttons */}
           <div style={{ marginBottom: "20px" }}>
@@ -322,12 +313,13 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full"
+                      className="w-full auth-input"
                       style={{
                         border: "1px solid #D1D5DB",
                         borderRadius: "8px",
                         backgroundColor: "#FFFFFF",
                         padding: "10px 12px 10px 36px",
+                        color: "#111827",
                       }}
                       placeholder="Your name"
                       required
@@ -361,12 +353,13 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full"
+                  className="w-full auth-input"
                   style={{
                     border: "1px solid #D1D5DB",
                     borderRadius: "8px",
                     backgroundColor: "#FFFFFF",
                     padding: "10px 12px 10px 36px",
+                    color: "#111827",
                   }}
                   placeholder="you@example.com"
                   required
@@ -389,21 +382,26 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 Password
               </Label>
               <div className="relative">
-                <Lock
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute top-1/2 -translate-y-1/2 w-5 h-5"
-                  style={{ left: "12px", color: "#9CA3AF" }}
-                />
+                  style={{ left: "12px", color: "#9CA3AF", background: "none", border: "none", cursor: "pointer" }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full"
+                  className="w-full auth-input"
                   style={{
                     border: "1px solid #D1D5DB",
                     borderRadius: "8px",
                     backgroundColor: "#FFFFFF",
-                    padding: "10px 12px 10px 36px",
+                    padding: "10px 12px 10px 44px",
+                    color: "#111827",
                   }}
                   placeholder="••••••••"
                   required

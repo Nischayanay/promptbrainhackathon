@@ -15,7 +15,7 @@ export function PBAuthPage({ onNavigateToLanding, onAuthSuccess }: PBAuthPagePro
   console.log('🔧 PBAuthPage props:', { onAuthSuccess: !!onAuthSuccess });
   
   return (
-    <div className="pbauth-wrapper">
+    <div className="pbauth-container h-screen w-full relative">
       <PBAuthApp onAuthSuccess={onAuthSuccess} />
       
       {/* Navigation overlay */}

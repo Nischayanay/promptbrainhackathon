@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
-import { HeroSection } from '../custom-dashboard';
 import { Toaster } from 'sonner';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCredits } from '../../contexts/CreditContext';
+import { HeroSection } from '../custom-user-dashboard/HeroSection';
+import { FeedbackSection } from '../custom-user-dashboard/FeedbackSection';
+import { Footer } from '../custom-user-dashboard/Footer';
+import { FloatingCTA } from '../custom-user-dashboard/FloatingCTA';
+import { MidpointCTA } from '../custom-user-dashboard/MidpointCTA';
 import '../../styles/custom-dashboard.css';
 
 export function CustomDashboardPage() {
@@ -63,6 +67,32 @@ export function CustomDashboardPage() {
       <main id="main-content" className="relative">
         <HeroSection />
       </main>
+
+      {/* Midpoint CTA - F-Pattern Optimization */}
+      <MidpointCTA onAction={() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => {
+          document.getElementById('prompt-input')?.focus();
+        }, 600);
+      }} />
+
+      {/* Feedback Section - Tertiary Zone */}
+      <section className="relative" aria-labelledby="feedback-heading">
+        <FeedbackSection />
+      </section>
+
+      {/* Footer - Tertiary Zone */}
+      <footer className="relative">
+        <Footer />
+      </footer>
+
+      {/* Floating CTA - Conversion Optimization */}
+      <FloatingCTA onAction={() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => {
+          document.getElementById('prompt-input')?.focus();
+        }, 600);
+      }} />
 
       {/* Toast Notifications - Accessible announcements */}
       <Toaster 
