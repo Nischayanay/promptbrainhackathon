@@ -61,6 +61,8 @@
     "https://deno.land/std@0.168.0/async/retry.ts": "e8e5173623915bbc0ddc537698fa418cf875456c347eda1ed453528645b42e67",
     "https://deno.land/std@0.168.0/async/tee.ts": "3a47cc4e9a940904fd4341f0224907e199121c80b831faa5ec2b054c6d2eff5e",
     "https://deno.land/std@0.168.0/http/server.ts": "e99c1bee8a3f6571ee4cdeb2966efad465b8f6fe62bec1bdb59c1f007cc4d155",
+    "https://esm.sh/@google/generative-ai@0.21.0": "c50ac2729c07a30e82649ed868dbd424d8c37121206b74ded320559908856ff1",
+    "https://esm.sh/@google/generative-ai@0.21.0/denonext/generative-ai.mjs": "528c34720a54c74addf4d7e37f0eec397983af387d30b6edd07f6486ffd5cd0a",
     "https://esm.sh/@supabase/auth-js@2.76.1/denonext/auth-js.mjs": "34acd2684c9861b7b753d2d06c77e548eb63d06c8a6081e3e2aa6aac01b006f9",
     "https://esm.sh/@supabase/functions-js@2.76.1/denonext/functions-js.mjs": "8f74804adb4268b17cc2d677dd84269f4e2c5ab848eeaf3e5759d5ab78e18100",
     "https://esm.sh/@supabase/node-fetch@2.6.15/denonext/node-fetch.mjs": "0bae9052231f4f6dbccc7234d05ea96923dbf967be12f402764580b6bf9f713d",

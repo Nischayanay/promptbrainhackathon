@@ -72,7 +72,11 @@ export class GeminiService {
 
   constructor(config?: Partial<GeminiConfig>) {
     this.config = {
-      apiKey: config?.apiKey || process.env.GEMINI_API_KEY || '',
+      apiKey: config?.apiKey || 
+              (typeof window !== 'undefined' ? 
+                import.meta.env.VITE_GEMINI_API_KEY : 
+                process.env.GEMINI_API_KEY) || 
+              'AIzaSyDVPwtK_oo9CQyguB9AwkjNWAzDcaah93Y',
       model: config?.model || 'gemini-1.5-pro',
       baseUrl: config?.baseUrl || 'https://generativelanguage.googleapis.com/v1beta',
       timeout: config?.timeout || 30000,

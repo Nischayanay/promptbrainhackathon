@@ -22,10 +22,20 @@ export class BackendBrainDatabase {
   private supabase: SupabaseClient;
 
   constructor(supabaseUrl?: string, supabaseKey?: string) {
-    this.supabase = createClient(
-      supabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      supabaseKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-    );
+    // Fix environment variables for Vite
+    const url = supabaseUrl || 
+                (typeof window !== 'undefined' ? 
+                  import.meta.env.VITE_SUPABASE_URL : 
+                  process.env.VITE_SUPABASE_URL) || 
+                'https://qaugvrsaeydptmsxllcu.supabase.co';
+    
+    const key = supabaseKey || 
+                (typeof window !== 'undefined' ? 
+                  import.meta.env.VITE_SUPABASE_ANON_KEY : 
+                  process.env.VITE_SUPABASE_ANON_KEY) || 
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdWd2cnNhZXlkcHRtc3hsbGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MDA3NzksImV4cCI6MjA2NTQ3Njc3OX0.MdbV6BTROTWJdFWUW1t3z45eC4nidMnNb5M-qNqPcqU';
+    
+    this.supabase = createClient(url, key);
   }
 
   getClient(): SupabaseClient {
