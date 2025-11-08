@@ -7,11 +7,15 @@ import { FeedbackSection } from '../custom-user-dashboard/FeedbackSection';
 import { Footer } from '../custom-user-dashboard/Footer';
 import { FloatingCTA } from '../custom-user-dashboard/FloatingCTA';
 import { MidpointCTA } from '../custom-user-dashboard/MidpointCTA';
+import { FloatingCreditsOrb } from '../credits/FloatingCreditsOrb';
 import '../../styles/custom-dashboard.css';
 
 export function CustomDashboardPage() {
   const { user } = useAuth();
-  const { refreshCredits } = useCredits();
+  const { balance, refreshCredits } = useCredits();
+  
+  // Each user gets 20 credits per day, resets at midnight
+  const maxCredits = 20;
 
 
 
@@ -93,6 +97,18 @@ export function CustomDashboardPage() {
           document.getElementById('prompt-input')?.focus();
         }, 600);
       }} />
+
+      {/* Floating Credits Orb */}
+      {user && (
+        <FloatingCreditsOrb
+          credits={balance}
+          maxCredits={maxCredits}
+          onAddCredits={() => {
+            // TODO: Implement upgrade flow
+            console.log('Upgrade clicked');
+          }}
+        />
+      )}
 
       {/* Toast Notifications - Accessible announcements */}
       <Toaster 
