@@ -50,7 +50,7 @@ export function useSessionManager(config: Partial<SessionConfig> = {}) {
     if (timeSinceActivity > finalConfig.maxInactiveTime) {
       handleAutoLogout()
     }
-  }, [user, finalConfig, signOut])
+  }, [user, finalConfig, showLogoutWarning, handleAutoLogout])
 
   // Show graceful logout warning
   const showLogoutWarning = useCallback(() => {
