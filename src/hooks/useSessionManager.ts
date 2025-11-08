@@ -18,7 +18,7 @@ export function useSessionManager(config: Partial<SessionConfig> = {}) {
   const finalConfig = { ...DEFAULT_CONFIG, ...config }
   const lastActivityRef = useRef<number>(Date.now())
   const warningShownRef = useRef<boolean>(false)
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Update last activity time
   const updateActivity = useCallback(() => {
@@ -31,26 +31,46 @@ export function useSessionManager(config: Partial<SessionConfig> = {}) {
     }
   }, [user])
 
-  // Check session validity
-  const checkSession = useCallback(() => {
-    if (!user) return
-
-    const now = Date.now()
-    const storedActivity = localStorage.getItem('pb_last_activity')
-    const lastActivity = storedActivity ? parseInt(storedActivity) : lastActivityRef.current
-    const timeSinceActivity = now - lastActivity
-
-    // Show warning if approaching logout time
-    if (timeSinceActivity > (finalConfig.maxInactiveTime - finalConfig.warningTime) && !warningShownRef.current) {
-      warningShownRef.current = true
-      showLogoutWarning()
-    }
-
-    // Auto logout if exceeded max inactive time
-    if (timeSinceActivity > finalConfig.maxInactiveTime) {
-      handleAutoLogout()
-    }
-  }, [user, finalConfig, showLogoutWarning, handleAutoLogout])
+  // Handle auto logout
+  const handleAutoLogout = useCallback(async () => {
+    localStorage.removeItem('pb_last_activity')
+    localStorage.removeItem('pb_auth_method')
+    
+    // Show logout notification
+    const logoutDiv = document.createElement('div')
+    logoutDiv.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, rgba(239,68,68,0.95) 0%, rgba(185,28,28,0.95) 100%);
+        color: white;
+        padding: 24px 32px;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        backdrop-filter: blur(20px);
+        z-index: 10001;
+        font-family: 'Inter', sans-serif;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.1);
+      ">
+        <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
+        <div style="font-weight: 600; margin-bottom: 8px;">Session Expired</div>
+        <div style="opacity: 0.9; font-size: 14px;">You've been logged out due to inactivity</div>
+      </div>
+    `
+    
+    document.body.appendChild(logoutDiv)
+    
+    setTimeout(() => {
+      if (document.body.contains(logoutDiv)) {
+        document.body.removeChild(logoutDiv)
+      }
+    }, 3000)
+    
+    await signOut()
+  }, [signOut])
 
   // Show graceful logout warning
   const showLogoutWarning = useCallback(() => {
@@ -109,46 +129,26 @@ export function useSessionManager(config: Partial<SessionConfig> = {}) {
     }, 30000)
   }, [finalConfig.warningTime, updateActivity])
 
-  // Handle auto logout
-  const handleAutoLogout = useCallback(async () => {
-    localStorage.removeItem('pb_last_activity')
-    localStorage.removeItem('pb_auth_method')
-    
-    // Show logout notification
-    const logoutDiv = document.createElement('div')
-    logoutDiv.innerHTML = `
-      <div style="
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(135deg, rgba(239,68,68,0.95) 0%, rgba(185,28,28,0.95) 100%);
-        color: white;
-        padding: 24px 32px;
-        border-radius: 16px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        backdrop-filter: blur(20px);
-        z-index: 10001;
-        font-family: 'Inter', sans-serif;
-        text-align: center;
-        border: 1px solid rgba(255,255,255,0.1);
-      ">
-        <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
-        <div style="font-weight: 600; margin-bottom: 8px;">Session Expired</div>
-        <div style="opacity: 0.9; font-size: 14px;">You've been logged out due to inactivity</div>
-      </div>
-    `
-    
-    document.body.appendChild(logoutDiv)
-    
-    setTimeout(() => {
-      if (document.body.contains(logoutDiv)) {
-        document.body.removeChild(logoutDiv)
-      }
-    }, 3000)
-    
-    await signOut()
-  }, [signOut])
+  // Check session validity
+  const checkSession = useCallback(() => {
+    if (!user) return
+
+    const now = Date.now()
+    const storedActivity = localStorage.getItem('pb_last_activity')
+    const lastActivity = storedActivity ? parseInt(storedActivity) : lastActivityRef.current
+    const timeSinceActivity = now - lastActivity
+
+    // Show warning if approaching logout time
+    if (timeSinceActivity > (finalConfig.maxInactiveTime - finalConfig.warningTime) && !warningShownRef.current) {
+      warningShownRef.current = true
+      showLogoutWarning()
+    }
+
+    // Auto logout if exceeded max inactive time
+    if (timeSinceActivity > finalConfig.maxInactiveTime) {
+      handleAutoLogout()
+    }
+  }, [user, finalConfig, showLogoutWarning, handleAutoLogout])
 
   // Set up activity listeners
   useEffect(() => {
