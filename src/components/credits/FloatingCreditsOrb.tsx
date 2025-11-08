@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Crown } from 'lucide-react'
+import { Crown, RefreshCw } from 'lucide-react'
 
 interface FloatingCreditsOrbProps {
   credits: number
   maxCredits?: number
   onAddCredits?: () => void
+  onRefresh?: () => void
   isAnimating?: boolean
   className?: string
 }
@@ -14,6 +15,7 @@ export function FloatingCreditsOrb({
   credits,
   maxCredits = 20, // Default to 20 credits per day
   onAddCredits,
+  onRefresh,
   isAnimating = false,
   className = ''
 }: FloatingCreditsOrbProps) {

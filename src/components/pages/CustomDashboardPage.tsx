@@ -104,8 +104,8 @@ export function CustomDashboardPage() {
           credits={balance}
           maxCredits={maxCredits}
           onAddCredits={() => {
-            // TODO: Implement upgrade flow
-            console.log('Upgrade clicked');
+            // Force refresh credits
+            refreshCredits();
           }}
         />
       )}
