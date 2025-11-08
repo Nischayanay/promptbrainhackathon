@@ -163,6 +163,7 @@ export function SearchInterface() {
     setOutput('');
     setValidationMessage('');
     setHasInteracted(true);
+    setProcessingStage('thinking');
 
     // Trigger particle effect at send button
     if (sendButtonRef.current) {
@@ -175,8 +176,11 @@ export function SearchInterface() {
       console.log('🧠 Starting hybrid enhancement process...');
       console.log('📝 Input prompt:', value);
       
+      setProcessingStage('analyzing');
+      
       // Use only Gemini enhancement (Backend Brain disabled)
       console.log('🔄 Using Gemini enhancement...');
+      setProcessingStage('enhancing');
       const geminiResult = await enhanceWithGemini(value);
       
       let finalResult;
@@ -190,9 +194,14 @@ export function SearchInterface() {
       
       console.log('🎯 Final result:', finalResult);
       
+      setProcessingStage('finalizing');
+      
       // Clean formatted output
       setOutput(finalResult.output);
       setIsProcessing(false);
+      
+      // Show success celebration
+      setShowCelebration(true);
       
       // Show success affirmation
       const affirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
@@ -288,6 +297,14 @@ export function SearchInterface() {
 
   return (
     <>
+      {/* Success Celebration */}
+      <SuccessCelebration 
+        trigger={showCelebration}
+        onComplete={() => setShowCelebration(false)}
+        type="confetti"
+        intensity="medium"
+      />
+      
       {/* Particle Effect on Send */}
       {showParticles && (
         <ParticleEffect 
@@ -539,6 +556,12 @@ export function SearchInterface() {
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={spring}
             >
+              <div className="mb-4">
+                <PersonalityTypingIndicator 
+                  isVisible={true}
+                  stage={processingStage}
+                />
+              </div>
               <SkeletonOutput />
             </motion.div>
           )}
