@@ -2,17 +2,22 @@ import { useEffect } from 'react';
 import { Toaster } from 'sonner';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCredits } from '../../contexts/CreditContext';
+import { useSessionManager } from '../../hooks/useSessionManager';
 import { HeroSection } from '../custom-user-dashboard/HeroSection';
 import { FeedbackSection } from '../custom-user-dashboard/FeedbackSection';
 import { Footer } from '../custom-user-dashboard/Footer';
 import { FloatingCTA } from '../custom-user-dashboard/FloatingCTA';
 import { MidpointCTA } from '../custom-user-dashboard/MidpointCTA';
 import { FloatingCreditsOrb } from '../credits/FloatingCreditsOrb';
+import { DashboardTransition } from '../ui/PageTransition';
 import '../../styles/custom-dashboard.css';
 
 export function CustomDashboardPage() {
   const { user } = useAuth();
   const { balance, refreshCredits } = useCredits();
+  
+  // Initialize session management for this user
+  useSessionManager();
   
   // Each user gets 20 credits per day, resets at midnight
   const maxCredits = 20;
@@ -35,14 +40,15 @@ export function CustomDashboardPage() {
 
 
   return (
-    <div 
-      className="min-h-screen text-white relative overflow-x-hidden" 
-      style={{ 
-        background: 'var(--pb-black, #0a0a0a)',
-        minHeight: '100vh',
-        color: 'white'
-      }}
-    >
+    <DashboardTransition>
+      <div 
+        className="min-h-screen text-white relative overflow-x-hidden" 
+        style={{ 
+          background: 'var(--pb-black, #0a0a0a)',
+          minHeight: '100vh',
+          color: 'white'
+        }}
+      >
       {/* Skip to main content for accessibility */}
       <a 
         href="#main-content" 
@@ -122,6 +128,7 @@ export function CustomDashboardPage() {
           },
         }}
       />
-    </div>
+      </div>
+    </DashboardTransition>
   );
 }

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { authService, AuthResult, UserProfile } from '../services/AuthService'
+import { useSessionManager } from '../hooks/useSessionManager'
 
 interface AuthContextType {
   user: User | null
@@ -26,6 +27,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // Initialize session manager for authenticated users
+  const sessionManager = useSessionManager()
 
   // Load initial session and profile
   useEffect(() => {

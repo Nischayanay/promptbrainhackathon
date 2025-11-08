@@ -5,6 +5,9 @@ import { toast } from './PremiumToast';
 import { EmptyState } from './EmptyState';
 import { ParticleEffect } from './ParticleEffect';
 import { SkeletonOutput } from './PremiumSkeleton';
+import { SuccessCelebration } from '../ui/SuccessCelebration';
+import { PersonalityTypingIndicator } from '../ui/TypingIndicator';
+import { EnhancedButton } from '../ui/EnhancedButton';
 
 
 // Spring animation config
@@ -99,6 +102,8 @@ export function SearchInterface() {
   const [showParticles, setShowParticles] = useState(false);
   const [particlePos, setParticlePos] = useState({ x: 0, y: 0 });
   const [showCopyDropdown, setShowCopyDropdown] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [processingStage, setProcessingStage] = useState<'thinking' | 'analyzing' | 'enhancing' | 'finalizing'>('thinking');
   const sendButtonRef = useRef<HTMLButtonElement>(null);
 
 
